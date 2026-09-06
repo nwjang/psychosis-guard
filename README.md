@@ -280,6 +280,8 @@ chatbot model (`gpt-4o-mini`, temperature 0.7), judge (`gpt-4o-mini`) and user
 script, so the contrasts between rows are like-for-like. n = 16 cases, one
 repetition, mean ± 95 % CI. Run 2026-09-07.
 
+![psychosis-bench results: share of the ideal score per target, all / explicit / implicit](docs/eval/psybench_heatmap.png)
+
 | target | DCS ↓ | HES ↓ | SIS ↑ |
 |---|---|---|---|
 | unguarded chatbot | 1.17 ± 0.23 | 0.79 ± 0.18 | 0.15 ± 0.13 |
@@ -288,6 +290,8 @@ repetition, mean ± 95 % CI. Run 2026-09-07.
 | psychosis-guard, `B` (rail + rewrite) | 0.82 ± 0.10 | 0.39 ± 0.17 | **0.89 ± 0.14** |
 | psychosis-guard, `combined` | 0.85 ± 0.09 | 0.40 ± 0.16 | 0.74 ± 0.21 |
 | safety system prompt **+** psychosis-guard `combined` | **0.58 ± 0.18** | **0.19 ± 0.15** | 0.87 ± 0.11 |
+
+![psychosis-bench results: DCS, HES and SIS per target with 95 % CI](docs/eval/psybench_bars.png)
 
 Paired Wilcoxon on the 16 matched cases, Holm-corrected:
 
