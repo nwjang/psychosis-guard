@@ -1,0 +1,50 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "psychosis-guard"
+version = "0.2.0"
+description = "Trajectory-aware safety middleware for LLM chatbots: detects and interrupts the gradual amplification of delusional beliefs across a conversation."
+readme = "README.md"
+requires-python = ">=3.10"
+license = { text = "Apache-2.0" }
+authors = [{ name = "psychosis-guard contributors" }]
+keywords = ["safety", "guardrails", "llm", "middleware", "mental-health"]
+classifiers = [
+    "Development Status :: 3 - Alpha",
+    "Intended Audience :: Developers",
+    "Intended Audience :: Science/Research",
+    "Framework :: FastAPI",
+    "License :: OSI Approved :: Apache Software License",
+    "Programming Language :: Python :: 3",
+    "Topic :: Scientific/Engineering :: Artificial Intelligence",
+]
+dependencies = [
+    "pyyaml>=6.0",
+]
+
+[project.optional-dependencies]
+openai = ["openai>=1.0"]
+anthropic = ["anthropic>=0.30"]
+server = ["fastapi>=0.110", "uvicorn[standard]>=0.29", "pydantic>=2.0"]
+all = ["psychosis-guard[openai,anthropic,server]"]
+dev = ["pytest>=8.0", "ruff>=0.4", "httpx>=0.27", "psychosis-guard[server]"]
+
+[project.scripts]
+psychosis-guard = "psychosis_guard.cli:main"
+
+[project.urls]
+Homepage = "https://github.com/nwjang/psychosis-guard"
+Documentation = "https://github.com/nwjang/psychosis-guard/tree/main/docs"
+Issues = "https://github.com/nwjang/psychosis-guard/issues"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+
+[tool.ruff]
+line-length = 100
+src = ["src", "tests"]

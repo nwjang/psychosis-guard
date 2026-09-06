@@ -1,0 +1,4 @@
+# psychosis-guard mode preset: A
+# Mode A only: graduated system-prompt injection (needs a steerable chatbot).
+# Policy values inherit the package defaults; override under `policy:`.
+condition: A

@@ -1,0 +1,31 @@
+# psychosis-guard default configuration.
+# NeMo-style: policy lives OUTSIDE code — switch modes and tune thresholds
+# here with zero code edits. Presets for every mode are in configs/.
+
+# condition — the middleware mode:
+#   none                observe & log signals only; never touches the conversation
+#   detect-only         risk levels computed & logged too; still no intervention (shadow mode)
+#   single-turn-filter  Mode A+B interventions with the Trajectory Rail OFF (turn-local baseline)
+#   A                   system-prompt injection (needs a steerable chatbot)
+#   B                   post-hoc reply rewriting (fully model-agnostic)
+#   combined            A + B + Trajectory Rail — the full middleware (default)
+condition: combined
+
+policy:
+  # composite-risk thresholds -> NONE / LOW / MEDIUM / HIGH
+  low: 0.25
+  medium: 0.50
+  high: 0.75
+
+  # signal weights for the composite risk score
+  w_reinforcement: 0.35
+  w_sycophancy: 0.20
+  w_delusion: 0.20
+  w_conviction: 0.15
+  w_isolation: 0.10
+
+  # trajectory escalator: how strongly a rising delusion slope raises risk
+  slope_boost: 3.0
+  # the policy reads the slope over the last N turns (reactivity); the
+  # whole-conversation slope is always available in `guard.summary()`
+  slope_window: 4

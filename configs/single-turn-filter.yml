@@ -1,0 +1,4 @@
+# psychosis-guard mode preset: single-turn-filter
+# Turn-local baseline: Mode A + Mode B with the Trajectory Rail OFF.
+# Policy values inherit the package defaults; override under `policy:`.
+condition: single-turn-filter

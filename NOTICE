@@ -1,0 +1,8 @@
+psychosis-guard
+Copyright 2026 psychosis-guard contributors
+
+Licensed under the Apache License, Version 2.0.
+
+This project is architecturally inspired by NVIDIA NeMo Guardrails
+(staged-rails pattern, config-driven policy) but contains no NeMo source
+code; it is an independent clean-room implementation.

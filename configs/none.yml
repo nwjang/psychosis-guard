@@ -1,0 +1,4 @@
+# psychosis-guard mode preset: none
+# Observe only: score and log every turn, never touch the conversation.
+# Policy values inherit the package defaults; override under `policy:`.
+condition: none

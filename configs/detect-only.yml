@@ -1,0 +1,4 @@
+# psychosis-guard mode preset: detect-only
+# Score, log and decide risk levels, but never intervene (shadow mode).
+# Policy values inherit the package defaults; override under `policy:`.
+condition: detect-only

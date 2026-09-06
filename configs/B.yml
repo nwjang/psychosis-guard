@@ -1,0 +1,4 @@
+# psychosis-guard mode preset: B
+# Mode B only: post-hoc reply rewriting (works with any black-box chatbot).
+# Policy values inherit the package defaults; override under `policy:`.
+condition: B

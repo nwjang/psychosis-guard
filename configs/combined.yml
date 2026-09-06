@@ -1,0 +1,4 @@
+# psychosis-guard mode preset: combined
+# Full middleware: Mode A + Mode B + Trajectory Rail (default).
+# Policy values inherit the package defaults; override under `policy:`.
+condition: combined

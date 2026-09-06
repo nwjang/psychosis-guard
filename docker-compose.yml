@@ -1,0 +1,16 @@
+services:
+  psychosis-guard:
+    build: .
+    image: psychosis-guard:latest
+    ports:
+      - "8080:8080"
+    env_file:
+      - .env
+    environment:
+      # single replica: sessions live in process memory
+      PG_HOST: 0.0.0.0
+      PG_PORT: "8080"
+    volumes:
+      # optional: mount your own policy config and point PG_CONFIG at it
+      - ./config.yml:/app/config.yml:ro
+    restart: unless-stopped

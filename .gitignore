@@ -1,0 +1,18 @@
+# secrets — never commit API keys
+.env
+.env.*
+
+# python
+__pycache__/
+*.py[cod]
+*.egg-info/
+build/
+dist/
+.venv/
+
+# tooling
+.pytest_cache/
+.ruff_cache/
+
+# macOS
+.DS_Store
