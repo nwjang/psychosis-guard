@@ -268,6 +268,57 @@ psychosis-guard demo [--turns N]                            offline unguarded-vs
 psychosis-guard is complementary: it slots behind or beside content rails rather
 than replacing them.
 
+## Evaluation
+
+Measured on **psychosis-bench** (Dohnány et al. 2025, [arXiv:2509.10970](https://arxiv.org/abs/2509.10970)),
+a public benchmark of 16 scripted 12-turn conversations that progress from
+loneliness to a delusional belief to a harmful act. Every turn is scored with the
+benchmark's own LLM-judge rubric: **DCS** delusion confirmation (0-2, lower is
+better), **HES** harm enablement (0-2, lower is better), **SIS** whether a
+safety intervention was offered (0-1, higher is better). All targets use the same
+chatbot model (`gpt-4o-mini`, temperature 0.7), judge (`gpt-4o-mini`) and user
+script, so the contrasts between rows are like-for-like. n = 16 cases, one
+repetition, mean ± 95 % CI. Run 2026-09-07.
+
+| target | DCS ↓ | HES ↓ | SIS ↑ |
+|---|---|---|---|
+| unguarded chatbot | 1.17 ± 0.23 | 0.79 ± 0.18 | 0.15 ± 0.13 |
+| + one-paragraph safety system prompt | 0.74 ± 0.15 | 0.33 ± 0.18 | 0.76 ± 0.18 |
+| psychosis-guard, Trajectory Rail **off** (turn-local) | 0.98 ± 0.13 | 0.72 ± 0.17 | 0.20 ± 0.17 |
+| psychosis-guard, `B` (rail + rewrite) | 0.82 ± 0.10 | 0.39 ± 0.17 | **0.89 ± 0.14** |
+| psychosis-guard, `combined` | 0.85 ± 0.09 | 0.40 ± 0.16 | 0.74 ± 0.21 |
+| safety system prompt **+** psychosis-guard `combined` | **0.58 ± 0.18** | **0.19 ± 0.15** | 0.87 ± 0.11 |
+
+Paired Wilcoxon on the 16 matched cases, Holm-corrected:
+
+- **vs the unguarded chatbot**, `B` and `combined` improve all three metrics
+  (d = 0.8-2.1, all p < .02) and eliminate every full-validation (DCS = 2) and
+  full-compliance (HES = 2) turn.
+- **Trajectory Rail ablation.** `B` vs the same pipeline with the rail off
+  differs only in the rail; the rail accounts for DCS −0.16, HES −0.33, SIS
+  +0.69 (all p < .05). Turn-local scoring under-calls risk on a slowly
+  escalating script, so the rewriter fires at the wrong level.
+- **vs a safety system prompt alone**, the middleware is statistically
+  indistinguishable: parity, obtained without access to the chatbot's prompt.
+  Stacking the two is the best row on every metric (significant vs
+  `combined`; directionally better than the prompt alone, not significant at
+  n = 16).
+- **Utility.** 0 interventions in 520 turns of benign control conversations.
+
+**What this does not show.** These are scores on the chatbot's replies to a
+fixed script. In a separate reactive simulation, where an LLM-played user
+adjusts their next message to the reply, the middleware's referral and
+pushback rates rise just as here, but the simulated user's delusion density
+and conviction do not improve (`combined` ≈ unguarded); interventions that
+insert the most safety language, the post-hoc rewriter alone and the safety
+system prompt, make that simulated user *worse*. The intervention text is
+real; the framing around it is what still needs work (the `ADVISER-REVIEW`
+prompts). That simulator is unvalidated and the judge is an LLM checked only
+against another LLM (κ ≈ 0.5), so treat the table above as a bot-side
+benchmark, not evidence of user outcomes. Runner, scripts and per-turn
+transcripts are in the research repository; three repetitions and human judge
+labels are the planned next step.
+
 ## Learn more
 
 - [Architecture](docs/architecture.md) (Korean: [docs/architecture.ko.md](docs/architecture.ko.md))

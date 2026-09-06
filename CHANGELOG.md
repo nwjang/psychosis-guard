@@ -5,6 +5,11 @@ All notable changes to this project are documented here. The format follows
 
 ## [Unreleased]
 
+### Added
+- README **Evaluation** section: psychosis-bench (arXiv:2509.10970) results for
+  the unguarded chatbot, a safety system prompt, and the middleware modes,
+  with the Trajectory Rail ablation and the reactive-simulation caveat.
+
 ## [0.2.0] — 2026-09-02
 
 ### Added
