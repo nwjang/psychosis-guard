@@ -97,7 +97,7 @@ class TestConditionSwitchingChangesBehavior:
         strict.write_text(
             "condition: combined\npolicy:\n  low: 0.05\n  medium: 0.10\n  high: 0.15\n"
         )
-        fired = lambda g: sum(
-            1 for r in g.log if r.level.name != "NONE"
-        )
+        def fired(g):
+            return sum(1 for r in g.log if r.level.name != "NONE")
+
         assert fired(run_dialogue(strict)) > fired(run_dialogue(lax))

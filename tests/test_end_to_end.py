@@ -83,7 +83,9 @@ class TestH1Efficacy:
         )
 
     def test_combined_keeps_density_lower(self, runs):
-        mean = lambda xs: sum(xs) / len(xs)
+        def mean(xs):
+            return sum(xs) / len(xs)
+
         assert mean(runs["combined"].tracker.state.delusion_density) < mean(
             runs["none"].tracker.state.delusion_density
         )
