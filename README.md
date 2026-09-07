@@ -2,6 +2,7 @@
 
 English | [한국어](README.ko.md)
 
+[![PyPI](https://img.shields.io/pypi/v/psychosis-guard.svg)](https://pypi.org/project/psychosis-guard/)
 [![License](https://img.shields.io/badge/License-Apache_2.0-blue.svg)](LICENSE)
 [![Python](https://img.shields.io/badge/python-3.10%2B-blue.svg)](pyproject.toml)
 [![CI](https://github.com/nwjang/psychosis-guard/actions/workflows/ci.yml/badge.svg)](https://github.com/nwjang/psychosis-guard/actions/workflows/ci.yml)
@@ -38,14 +39,17 @@ as a Python library.
 ## Installation
 
 ```bash
-git clone https://github.com/nwjang/psychosis-guard.git
-cd psychosis-guard
-pip install -e ".[server,openai,anthropic]"
+pip install psychosis-guard                            # core library (mocks only)
+pip install "psychosis-guard[server,openai,anthropic]" # HTTP server + real LLM adapters
 ```
 
-For development (tests, lint):
+Extras: `server` (FastAPI/uvicorn), `openai`, `anthropic`, `all`.
+
+From source, for development (tests, lint):
 
 ```bash
+git clone https://github.com/nwjang/psychosis-guard.git
+cd psychosis-guard
 pip install -e ".[dev]"
 ```
 
@@ -55,7 +59,7 @@ Every user turn passes through five rail stages. Stages 1–3 and 5 mirror the
 input / dialog / output / action rails of NVIDIA NeMo Guardrails; Stage 4 is the
 new, cumulative-state stage.
 
-![psychosis-guard 5-stage pipeline](docs/assets/architecture.png)
+![psychosis-guard 5-stage pipeline](https://raw.githubusercontent.com/nwjang/psychosis-guard/main/docs/assets/architecture.png)
 
 | Stage | Rail | What it does |
 |---|---|---|
@@ -282,7 +286,7 @@ chatbot model (`gpt-4o-mini`, temperature 0.7), judge (`gpt-4o-mini`) and user
 script, so the contrasts between rows are like-for-like. n = 16 cases, one
 repetition, mean ± 95 % CI. Run 2026-09-07.
 
-![psychosis-bench results: share of the ideal score per target, all / explicit / implicit](docs/eval/psybench_heatmap.png)
+![psychosis-bench results: share of the ideal score per target, all / explicit / implicit](https://raw.githubusercontent.com/nwjang/psychosis-guard/main/docs/eval/psybench_heatmap.png)
 
 | target | DCS ↓ | HES ↓ | SIS ↑ |
 |---|---|---|---|
@@ -293,7 +297,7 @@ repetition, mean ± 95 % CI. Run 2026-09-07.
 | psychosis-guard, `combined` | 0.85 ± 0.09 | 0.40 ± 0.16 | 0.74 ± 0.21 |
 | safety system prompt **+** psychosis-guard `combined` | **0.58 ± 0.18** | **0.19 ± 0.15** | 0.87 ± 0.11 |
 
-![psychosis-bench results: DCS, HES and SIS per target with 95 % CI](docs/eval/psybench_bars.png)
+![psychosis-bench results: DCS, HES and SIS per target with 95 % CI](https://raw.githubusercontent.com/nwjang/psychosis-guard/main/docs/eval/psybench_bars.png)
 
 Paired Wilcoxon on the 16 matched cases, Holm-corrected:
 

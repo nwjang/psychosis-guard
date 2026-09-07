@@ -2,6 +2,7 @@
 
 [English](README.md) | 한국어
 
+[![PyPI](https://img.shields.io/pypi/v/psychosis-guard.svg)](https://pypi.org/project/psychosis-guard/)
 [![License](https://img.shields.io/badge/License-Apache_2.0-blue.svg)](LICENSE)
 [![Python](https://img.shields.io/badge/python-3.10%2B-blue.svg)](pyproject.toml)
 [![CI](https://github.com/nwjang/psychosis-guard/actions/workflows/ci.yml/badge.svg)](https://github.com/nwjang/psychosis-guard/actions/workflows/ci.yml)
@@ -37,14 +38,17 @@ OpenAI-compatible 서버, 또는 이미 운영 중인 봇), Python 라이브러�
 ## 설치
 
 ```bash
-git clone https://github.com/nwjang/psychosis-guard.git
-cd psychosis-guard
-pip install -e ".[server,openai,anthropic]"
+pip install psychosis-guard                            # 코어 라이브러리 (mock만)
+pip install "psychosis-guard[server,openai,anthropic]" # HTTP 서버 + 실제 LLM 어댑터
 ```
 
-개발용(테스트, lint):
+extras: `server` (FastAPI/uvicorn), `openai`, `anthropic`, `all`.
+
+소스에서 개발용으로 설치(테스트, lint):
 
 ```bash
+git clone https://github.com/nwjang/psychosis-guard.git
+cd psychosis-guard
 pip install -e ".[dev]"
 ```
 
@@ -54,7 +58,7 @@ pip install -e ".[dev]"
 input / dialog / output / action rail에 대응하고, Stage 4가 새로 추가된 누적 상태
 단계입니다.
 
-![psychosis-guard 5단계 파이프라인](docs/assets/architecture.png)
+![psychosis-guard 5단계 파이프라인](https://raw.githubusercontent.com/nwjang/psychosis-guard/main/docs/assets/architecture.png)
 
 | Stage | Rail | 역할 |
 |---|---|---|
@@ -275,7 +279,7 @@ enablement(0~2, 낮을수록 좋음), **SIS** safety intervention 제공 여부(
 judge(`gpt-4o-mini`), 같은 사용자 대본을 쓰므로 행 사이의 비교는 동일 조건입니다.
 n = 16 케이스, 반복 1회, 평균 ± 95 % CI. 실행일 2026-09-07.
 
-![psychosis-bench 결과: 대상별 이상값 대비 비율, all / explicit / implicit](docs/eval/psybench_heatmap.png)
+![psychosis-bench 결과: 대상별 이상값 대비 비율, all / explicit / implicit](https://raw.githubusercontent.com/nwjang/psychosis-guard/main/docs/eval/psybench_heatmap.png)
 
 | 대상 | DCS ↓ | HES ↓ | SIS ↑ |
 |---|---|---|---|
@@ -286,7 +290,7 @@ n = 16 케이스, 반복 1회, 평균 ± 95 % CI. 실행일 2026-09-07.
 | psychosis-guard, `combined` | 0.85 ± 0.09 | 0.40 ± 0.16 | 0.74 ± 0.21 |
 | 안전 system prompt **+** psychosis-guard `combined` | **0.58 ± 0.18** | **0.19 ± 0.15** | 0.87 ± 0.11 |
 
-![psychosis-bench 결과: 대상별 DCS, HES, SIS와 95 % CI](docs/eval/psybench_bars.png)
+![psychosis-bench 결과: 대상별 DCS, HES, SIS와 95 % CI](https://raw.githubusercontent.com/nwjang/psychosis-guard/main/docs/eval/psybench_bars.png)
 
 짝지은 16케이스에 대한 paired Wilcoxon, Holm 보정:
 

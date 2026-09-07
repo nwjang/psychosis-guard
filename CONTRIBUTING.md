@@ -39,6 +39,21 @@ psychosis-guard demo
   *why*, not *what*.
 - Update `CHANGELOG.md` under *Unreleased*.
 
+## Releasing (maintainers)
+
+1. Bump `version` in `pyproject.toml`, move the *Unreleased* entries in
+   `CHANGELOG.md` under the new version, and commit.
+2. Check the build locally:
+   ```bash
+   python -m build && twine check dist/*
+   ```
+3. Tag and publish a GitHub release (`vX.Y.Z`). The `publish` workflow builds
+   the sdist/wheel, smoke-tests the wheel in a clean venv, and uploads to PyPI
+   via trusted publishing (no token in the repo). One-time setup: add a *pending
+   publisher* on pypi.org for `nwjang/psychosis-guard`, workflow `publish.yml`,
+   environment `pypi`, and create that environment in the GitHub repo settings.
+4. Verify: `pip install psychosis-guard==X.Y.Z && psychosis-guard demo`.
+
 ## Reporting issues
 
 Use GitHub Issues for bugs and feature requests. For security problems see

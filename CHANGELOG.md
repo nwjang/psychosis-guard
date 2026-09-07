@@ -10,6 +10,8 @@ All notable changes to this project are documented here. The format follows
   the unguarded chatbot, a safety system prompt, and the middleware modes,
   with the Trajectory Rail ablation and the reactive-simulation caveat.
 - Evaluation figures (`docs/eval/`) and a Korean README (`README.ko.md`).
+- PyPI packaging: `pip install psychosis-guard`, a `publish` workflow (trusted
+  publishing on GitHub release), and a release checklist in `CONTRIBUTING.md`.
 
 ## [0.2.0] — 2026-09-02
 
