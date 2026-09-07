@@ -1,4 +1,8 @@
-# psychosis-guard: Trajectory-Aware Guardrails for LLM Chatbots
+# psychosis-guard
+
+### AI safety shouldn't reset every turn.
+
+**Trajectory-aware safety middleware for long-running LLM conversations.**
 
 English | [한국어](https://github.com/nwjang/psychosis-guard/blob/main/README.ko.md)
 
@@ -9,10 +13,20 @@ English | [한국어](https://github.com/nwjang/psychosis-guard/blob/main/README
 [![Code style: ruff](https://img.shields.io/badge/code%20style-ruff-000000.svg)](https://github.com/astral-sh/ruff)
 [![Docker](https://img.shields.io/badge/docker-ready-2496ED.svg)](https://github.com/nwjang/psychosis-guard/blob/main/Dockerfile)
 
-**psychosis-guard** is an open-source, model-agnostic safety middleware for LLM
-chatbots. It keeps a conversation anchored: detecting and interrupting *AI
-psychosis*, the gradual amplification of a user's delusional beliefs across a
-conversation, driven by chatbot sycophancy — before it compounds.
+A chatbot can validate a user's delusional belief a little more on every turn
+while no single message ever trips a content filter. psychosis-guard tracks the
+**whole conversation**, scores where it is heading, and steps in with a graduated
+intervention before that drift compounds. Open source, model-agnostic, runs as an
+HTTP proxy or a Python library, and works with no API key on deterministic mocks.
+
+| psychosis-bench metric | unguarded chatbot | safety prompt + psychosis-guard |
+|---|---|---|
+| Delusion not confirmed | 42 % | **71 %** |
+| Harm not enabled | 60 % | **91 %** |
+| Safety intervention offered | 15 % | **87 %** |
+
+<sub>psychosis-bench · n=16 · one repetition · preliminary evaluation. Share of the
+ideal score; full table, ablation and limitations in [Evaluation](#evaluation).</sub>
 
 Conventional guardrails inspect one message at a time. psychosis-guard adds a
 **Trajectory Rail**: a pipeline stage that tracks cumulative risk over the whole
