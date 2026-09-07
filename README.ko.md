@@ -1,13 +1,13 @@
 # psychosis-guard: LLM 챗봇을 위한 Trajectory-Aware Guardrails
 
-[English](README.md) | 한국어
+[English](https://github.com/nwjang/psychosis-guard/blob/main/README.md) | 한국어
 
 [![PyPI](https://img.shields.io/pypi/v/psychosis-guard.svg)](https://pypi.org/project/psychosis-guard/)
-[![License](https://img.shields.io/badge/License-Apache_2.0-blue.svg)](LICENSE)
-[![Python](https://img.shields.io/badge/python-3.10%2B-blue.svg)](pyproject.toml)
+[![License](https://img.shields.io/badge/License-Apache_2.0-blue.svg)](https://github.com/nwjang/psychosis-guard/blob/main/LICENSE)
+[![Python](https://img.shields.io/badge/python-3.10%2B-blue.svg)](https://github.com/nwjang/psychosis-guard/blob/main/pyproject.toml)
 [![CI](https://github.com/nwjang/psychosis-guard/actions/workflows/ci.yml/badge.svg)](https://github.com/nwjang/psychosis-guard/actions/workflows/ci.yml)
 [![Code style: ruff](https://img.shields.io/badge/code%20style-ruff-000000.svg)](https://github.com/astral-sh/ruff)
-[![Docker](https://img.shields.io/badge/docker-ready-2496ED.svg)](Dockerfile)
+[![Docker](https://img.shields.io/badge/docker-ready-2496ED.svg)](https://github.com/nwjang/psychosis-guard/blob/main/Dockerfile)
 
 **psychosis-guard**는 LLM 챗봇을 위한 오픈소스, model-agnostic 안전 미들웨어입니다.
 대화가 제자리를 지키도록 붙잡아 줍니다. 챗봇의 sycophancy 때문에 사용자의 망상적
@@ -181,7 +181,7 @@ curl -X POST localhost:8080/v1/guard/check -H 'content-type: application/json' \
 }
 ```
 
-전체 엔드포인트 문서: [docs/http-api.md](docs/http-api.md).
+전체 엔드포인트 문서: [docs/http-api.md](https://github.com/nwjang/psychosis-guard/blob/main/docs/http-api.md).
 
 ### Docker
 
@@ -204,7 +204,7 @@ curl localhost:8080/healthz
 ## 모드
 
 `config.yml`의 `condition` 키(또는 `PG_CONDITION`)가 모드를 선택합니다. 각 모드의
-preset은 [`configs/`](configs/)에 있습니다.
+preset은 [`configs/`](https://github.com/nwjang/psychosis-guard/tree/main/configs/)에 있습니다.
 
 | 모드 | 동작 |
 |---|---|
@@ -234,8 +234,8 @@ policy:
   slope_window: 4    # 정책이 돌아보는 턴 수
 ```
 
-런타임 설정은 환경 변수(`PG_*`)입니다. [`.env.example`](.env.example)과
-[docs/configuration.md](docs/configuration.md)를 참고하십시오.
+런타임 설정은 환경 변수(`PG_*`)입니다. [`.env.example`](https://github.com/nwjang/psychosis-guard/blob/main/.env.example)과
+[docs/configuration.md](https://github.com/nwjang/psychosis-guard/blob/main/docs/configuration.md)를 참고하십시오.
 
 ## 비용, 지연, 확장
 
@@ -319,22 +319,22 @@ simulator는 검증되지 않았고 judge는 다른 LLM으로만 확인된 LLM�
 
 ## 더 알아보기
 
-- [아키텍처](docs/architecture.ko.md) (English: [docs/architecture.md](docs/architecture.md))
-- [HTTP API 문서](docs/http-api.md)
-- [설정 문서](docs/configuration.md)
-- [예제](examples/): `quickstart_mock.py` (키 불필요), `quickstart_openai.py`,
+- [아키텍처](https://github.com/nwjang/psychosis-guard/blob/main/docs/architecture.ko.md) (English: [docs/architecture.md](https://github.com/nwjang/psychosis-guard/blob/main/docs/architecture.md))
+- [HTTP API 문서](https://github.com/nwjang/psychosis-guard/blob/main/docs/http-api.md)
+- [설정 문서](https://github.com/nwjang/psychosis-guard/blob/main/docs/configuration.md)
+- [예제](https://github.com/nwjang/psychosis-guard/tree/main/examples/): `quickstart_mock.py` (키 불필요), `quickstart_openai.py`,
   `client_openai_sdk.py`
-- [Changelog](CHANGELOG.md)
+- [Changelog](https://github.com/nwjang/psychosis-guard/blob/main/CHANGELOG.md)
 
 ## 기여
 
-기여를 환영합니다. [CONTRIBUTING.md](CONTRIBUTING.md)와
-[Code of Conduct](CODE_OF_CONDUCT.md)를 읽어 주십시오. `ADVISER-REVIEW`로 표시된
+기여를 환영합니다. [CONTRIBUTING.md](https://github.com/nwjang/psychosis-guard/blob/main/CONTRIBUTING.md)와
+[Code of Conduct](https://github.com/nwjang/psychosis-guard/blob/main/CODE_OF_CONDUCT.md)를 읽어 주십시오. `ADVISER-REVIEW`로 표시된
 텍스트(개입 문구, judge와 rewriter 프롬프트)의 변경은 merge 전에 정신건강 전문가의
 승인이 필요합니다.
 
 ## 라이선스
 
-Apache License 2.0. [LICENSE](LICENSE)와 [NOTICE](NOTICE)를 참고하십시오. 독립적인
+Apache License 2.0. [LICENSE](https://github.com/nwjang/psychosis-guard/blob/main/LICENSE)와 [NOTICE](https://github.com/nwjang/psychosis-guard/blob/main/NOTICE)를 참고하십시오. 독립적인
 clean-room 구현이며, NVIDIA NeMo Guardrails에서 아키텍처 영감을 받았지만 NeMo 소스
 코드는 포함하지 않습니다.

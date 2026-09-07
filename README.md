@@ -1,13 +1,13 @@
 # psychosis-guard: Trajectory-Aware Guardrails for LLM Chatbots
 
-English | [한국어](README.ko.md)
+English | [한국어](https://github.com/nwjang/psychosis-guard/blob/main/README.ko.md)
 
 [![PyPI](https://img.shields.io/pypi/v/psychosis-guard.svg)](https://pypi.org/project/psychosis-guard/)
-[![License](https://img.shields.io/badge/License-Apache_2.0-blue.svg)](LICENSE)
-[![Python](https://img.shields.io/badge/python-3.10%2B-blue.svg)](pyproject.toml)
+[![License](https://img.shields.io/badge/License-Apache_2.0-blue.svg)](https://github.com/nwjang/psychosis-guard/blob/main/LICENSE)
+[![Python](https://img.shields.io/badge/python-3.10%2B-blue.svg)](https://github.com/nwjang/psychosis-guard/blob/main/pyproject.toml)
 [![CI](https://github.com/nwjang/psychosis-guard/actions/workflows/ci.yml/badge.svg)](https://github.com/nwjang/psychosis-guard/actions/workflows/ci.yml)
 [![Code style: ruff](https://img.shields.io/badge/code%20style-ruff-000000.svg)](https://github.com/astral-sh/ruff)
-[![Docker](https://img.shields.io/badge/docker-ready-2496ED.svg)](Dockerfile)
+[![Docker](https://img.shields.io/badge/docker-ready-2496ED.svg)](https://github.com/nwjang/psychosis-guard/blob/main/Dockerfile)
 
 **psychosis-guard** is an open-source, model-agnostic safety middleware for LLM
 chatbots. It keeps a conversation anchored: detecting and interrupting *AI
@@ -183,7 +183,7 @@ Every guarded response carries the assessment:
 }
 ```
 
-Full endpoint reference: [docs/http-api.md](docs/http-api.md).
+Full endpoint reference: [docs/http-api.md](https://github.com/nwjang/psychosis-guard/blob/main/docs/http-api.md).
 
 ### Docker
 
@@ -206,7 +206,7 @@ Set them independently with `PG_CHAT_*`, `PG_JUDGE_*`, `PG_REWRITER_*`.
 ## Modes
 
 The `condition` key in `config.yml` (or `PG_CONDITION`) selects the mode. Presets
-for each live in [`configs/`](configs/).
+for each live in [`configs/`](https://github.com/nwjang/psychosis-guard/tree/main/configs/).
 
 | Mode | Behaviour |
 |---|---|
@@ -236,8 +236,8 @@ policy:
   slope_window: 4    # turns the policy looks back over
 ```
 
-Runtime settings are environment variables (`PG_*`, see [`.env.example`](.env.example)
-and [docs/configuration.md](docs/configuration.md)).
+Runtime settings are environment variables (`PG_*`, see [`.env.example`](https://github.com/nwjang/psychosis-guard/blob/main/.env.example)
+and [docs/configuration.md](https://github.com/nwjang/psychosis-guard/blob/main/docs/configuration.md)).
 
 ## Cost, latency and scaling
 
@@ -331,22 +331,22 @@ labels are the planned next step.
 
 ## Learn more
 
-- [Architecture](docs/architecture.md) (Korean: [docs/architecture.ko.md](docs/architecture.ko.md))
-- [HTTP API reference](docs/http-api.md)
-- [Configuration reference](docs/configuration.md)
-- [Examples](examples/): `quickstart_mock.py` (no key), `quickstart_openai.py`,
+- [Architecture](https://github.com/nwjang/psychosis-guard/blob/main/docs/architecture.md) (Korean: [docs/architecture.ko.md](https://github.com/nwjang/psychosis-guard/blob/main/docs/architecture.ko.md))
+- [HTTP API reference](https://github.com/nwjang/psychosis-guard/blob/main/docs/http-api.md)
+- [Configuration reference](https://github.com/nwjang/psychosis-guard/blob/main/docs/configuration.md)
+- [Examples](https://github.com/nwjang/psychosis-guard/tree/main/examples/): `quickstart_mock.py` (no key), `quickstart_openai.py`,
   `client_openai_sdk.py`
-- [Changelog](CHANGELOG.md)
+- [Changelog](https://github.com/nwjang/psychosis-guard/blob/main/CHANGELOG.md)
 
 ## Contributing
 
-Contributions are welcome. Please read [CONTRIBUTING.md](CONTRIBUTING.md) and the
-[Code of Conduct](CODE_OF_CONDUCT.md). Changes to any text marked `ADVISER-REVIEW`
+Contributions are welcome. Please read [CONTRIBUTING.md](https://github.com/nwjang/psychosis-guard/blob/main/CONTRIBUTING.md) and the
+[Code of Conduct](https://github.com/nwjang/psychosis-guard/blob/main/CODE_OF_CONDUCT.md). Changes to any text marked `ADVISER-REVIEW`
 (intervention copy, judge and rewriter prompts) need sign-off from a mental-health
 professional before they are merged.
 
 ## License
 
-Apache License 2.0. See [LICENSE](LICENSE) and [NOTICE](NOTICE). This is an
+Apache License 2.0. See [LICENSE](https://github.com/nwjang/psychosis-guard/blob/main/LICENSE) and [NOTICE](https://github.com/nwjang/psychosis-guard/blob/main/NOTICE). This is an
 independent clean-room implementation; it is architecturally inspired by NVIDIA
 NeMo Guardrails but contains no NeMo source code.
