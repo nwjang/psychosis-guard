@@ -1,168 +1,320 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<title>psychosis-guard</title>
-<meta name="description" content="Trajectory-aware safety middleware for long-running LLM conversations.">
-<meta property="og:title" content="psychosis-guard">
-<meta property="og:description" content="AI safety shouldn't reset every turn. Trajectory-aware safety middleware for LLM chatbots.">
-<meta property="og:type" content="website">
-<meta property="og:url" content="https://nwjang.github.io/psychosis-guard/">
-<style>
-:root{
-  --bg:#fff; --ink:#1d1d1f; --ink-2:#6e6e73; --line:#e5e5ea; --panel:#f5f5f7; --link:#0066cc;
-  --font:-apple-system,BlinkMacSystemFont,"SF Pro Text","Helvetica Neue",Helvetica,Arial,sans-serif;
-  --mono:"SF Mono",ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;
-  color-scheme:light;
-}
-*{box-sizing:border-box}
-body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--font);font-size:17px;line-height:1.55;-webkit-font-smoothing:antialiased;letter-spacing:-.01em}
-a{color:var(--link);text-decoration:none}
-a:hover{text-decoration:underline}
-:focus-visible{outline:2px solid var(--link);outline-offset:3px}
-img{max-width:100%;height:auto;display:block}
-main{max-width:640px;margin:0 auto;padding:64px 24px 80px}
-.hero{background:#000;color:#f5f5f7;padding:96px 24px 88px;text-align:center}
-.hero .in{max-width:900px;margin:0 auto}
-.hero .eyebrow{font-size:.8125rem;font-weight:600;letter-spacing:.04em;text-transform:uppercase;color:#86868b}
-.hero h1{font-size:clamp(2.75rem,7vw,4.5rem);font-weight:700;letter-spacing:-.03em;line-height:1.05;margin:14px 0 0;color:#f5f5f7}
-.hero .sub{font-size:clamp(1.125rem,2.2vw,1.5rem);color:#86868b;max-width:720px;margin:22px auto 0;line-height:1.4;letter-spacing:-.012em}
-.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:24px;margin-top:72px}
-.stat .v{font-size:clamp(3.5rem,9vw,6rem);font-weight:700;letter-spacing:-.045em;line-height:1;background:linear-gradient(90deg,#0a84ff,#5e5ce6 55%,#bf5af2);-webkit-background-clip:text;background-clip:text;color:transparent;font-variant-numeric:tabular-nums}
-.stat .k{font-size:1.0625rem;font-weight:600;margin-top:16px;color:#f5f5f7}
-.stat .d{font-size:.9375rem;color:#86868b;margin-top:4px}
-.hero .foot{font-size:.8125rem;color:#86868b;margin:64px auto 0;max-width:760px}
-.hero .foot code{color:#a1a1a6}
-.hero .links{justify-content:center;margin-top:36px;gap:8px 28px;font-size:1.0625rem}
-.hero .links a{color:#2997ff}
-.hero .links a::after{content:" ›"}
-@media (max-width:640px){.hero{padding:72px 24px 64px}.stats{grid-template-columns:1fr;gap:40px;margin-top:56px}}
-h1{font-size:2.5rem;font-weight:600;letter-spacing:-.025em;line-height:1.1;margin:0}
-h2{font-size:1.25rem;font-weight:600;letter-spacing:-.015em;margin:64px 0 12px}
-p{margin:0 0 16px}
-.lead{font-size:1.25rem;color:var(--ink-2);margin:12px 0 0;letter-spacing:-.012em}
-.meta{color:var(--ink-2);font-size:.9375rem;margin:24px 0 0}
-.links{margin:20px 0 0;font-size:.9375rem;display:flex;flex-wrap:wrap;gap:6px 20px}
-hr{border:0;border-top:1px solid var(--line);margin:56px 0}
-figure{margin:24px 0 0}
-figure img{border:1px solid var(--line);border-radius:10px}
-figcaption{font-size:.875rem;color:var(--ink-2);margin-top:10px}
-ul{padding-left:20px;margin:0 0 16px}
-li{margin-bottom:6px}
-li b{font-weight:600}
-code{font-family:var(--mono);font-size:.875em}
-pre{margin:16px 0 0;background:var(--panel);border-radius:10px;padding:16px 18px;font-family:var(--mono);font-size:.8125rem;line-height:1.55;overflow-x:auto}
-pre code{font-size:inherit}
-.wide{margin:16px -24px 0;overflow-x:auto;padding:0 24px}
-table{border-collapse:collapse;width:100%;min-width:560px;font-size:.9375rem;font-variant-numeric:tabular-nums}
-th,td{padding:10px 12px;text-align:left;border-bottom:1px solid var(--line);vertical-align:top}
-th{font-weight:600;color:var(--ink-2);font-size:.8125rem}
-td.n,th.n{text-align:right;white-space:nowrap}
-td .ci{color:var(--ink-2);font-size:.85em}
-tr.best td{font-weight:600}
-.small{font-size:.875rem;color:var(--ink-2)}
-.note{background:var(--panel);border-radius:10px;padding:16px 18px;font-size:.9375rem;margin:16px 0 0}
-.note p:last-child{margin:0}
-.formula{font-family:var(--mono);font-size:.9375rem;margin:12px 0 16px}
-footer{font-size:.8125rem;color:var(--ink-2);margin-top:72px}
-footer a{color:var(--ink-2);text-decoration:underline}
-</style>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>psychosis-guard: Trajectory-Aware Safety Middleware for LLM Conversations</title>
+  <meta name="description" content="psychosis-guard tracks the whole conversation, not one message, and steps in with a graduated intervention before delusional drift compounds. Open source, model-agnostic.">
+  <meta property="og:title" content="psychosis-guard: Trajectory-Aware Safety Middleware for LLM Conversations">
+  <meta property="og:description" content="AI safety shouldn't reset every turn.">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://nwjang.github.io/psychosis-guard/">
+  <meta property="og:image" content="https://nwjang.github.io/psychosis-guard/assets/architecture.png">
+
+  <link href="https://fonts.googleapis.com/css?family=Google+Sans|Noto+Sans|Castoro&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bulma/0.9.4/css/bulma.min.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/academicons/1.9.4/css/academicons.min.css">
+  <style>
+    body { font-family: 'Noto Sans', sans-serif; }
+    .footer .icon-link { font-size: 25px; color: #000; }
+    .link-block a { margin-top: 5px; margin-bottom: 5px; }
+    .publication-title { font-family: 'Google Sans', sans-serif; }
+    .publication-authors { font-family: 'Google Sans', sans-serif; }
+    .publication-authors a { color: #3273dc !important; }
+    .publication-authors a:hover { text-decoration: underline; }
+    .author-block { display: inline-block; }
+    .publication-links { margin-top: 1rem; }
+    .publication-banner img { width: 100%; }
+    .teaser .hero-body { padding-top: 0; padding-bottom: 3rem; }
+    .teaser { font-family: 'Google Sans', sans-serif; }
+    .hero.is-light { background-color: #f5f5f5; }
+    .hero-body { padding: 3rem 1.5rem; }
+    .hero.is-small .hero-body { padding: 1.5rem 1.5rem; }
+    .results-figure img { width: 100%; }
+    .results-figure .subtitle { margin-top: 1rem; }
+    .content ol li, .content ul li { margin-bottom: .35rem; }
+    .content table td, .content table th { vertical-align: top; }
+    .content table .num { text-align: right; white-space: nowrap; font-variant-numeric: tabular-nums; }
+    .content table .ci { color: #7a7a7a; font-size: .85em; }
+    .content table tr.best td { font-weight: 700; background: #f3faf6; }
+    .formula { font-family: monospace; text-align: center; background: #f5f5f5; padding: .75rem 1rem; border-radius: 6px; margin: 1rem 0; overflow-x: auto; white-space: nowrap; }
+    .notification.is-warning.is-light { border-left: 4px solid #ffdd57; }
+    pre { border-radius: 6px; }
+    .footer { padding: 3rem 1.5rem; }
+  </style>
 </head>
 <body>
-<header class="hero">
-  <div class="in">
-    <div class="eyebrow">psychosis-guard · results on psychosis-bench</div>
-    <h1>AI safety shouldn't reset every turn.</h1>
-    <p class="sub">Trajectory-aware safety middleware for LLM chatbots. It watches the whole conversation, not one message, and steps in before slow drift toward a delusional belief compounds.</p>
-    <div class="stats">
-      <div class="stat"><div class="v">71%</div><div class="k">Delusion not confirmed</div><div class="d">up from 42% unguarded</div></div>
-      <div class="stat"><div class="v">91%</div><div class="k">Harm not enabled</div><div class="d">up from 60% unguarded</div></div>
-      <div class="stat"><div class="v">87%</div><div class="k">Safety intervention offered</div><div class="d">up from 15% unguarded</div></div>
-    </div>
-    <p class="foot">Share of the ideal score, safety prompt + psychosis-guard <code>combined</code>, on psychosis-bench (Dohnány et al., 2025): 16 scripted twelve-turn conversations that progress from loneliness to a delusional belief to a harmful act. Same chatbot and judge (<code>gpt-4o-mini</code>) for every row. n = 16, one repetition, run 2026-09-07. Preliminary.</p>
-    <div class="links">
-      <a href="https://github.com/nwjang/psychosis-guard">GitHub</a>
-      <a href="https://pypi.org/project/psychosis-guard/">PyPI</a>
-      <a href="https://github.com/nwjang/psychosis-guard/tree/main/docs">Docs</a>
-      <a href="https://arxiv.org/abs/2509.10970">psychosis-bench</a>
-      <a href="https://github.com/nwjang/psychosis-guard/blob/main/README.ko.md">한국어</a>
+
+<section class="hero">
+  <div class="hero-body">
+    <div class="container is-max-desktop">
+      <div class="columns is-centered">
+        <div class="column has-text-centered">
+          <h1 class="title is-1 publication-title">psychosis-guard: Trajectory-Aware Safety Middleware for Long-Running LLM Conversations</h1>
+          <div class="is-size-5 publication-authors">
+            <span class="author-block"><a href="https://github.com/nwjang" target="_blank">Namwoo Jang</a></span>
+          </div>
+          <div class="is-size-5 publication-authors">
+            <span class="author-block">Independent</span>
+          </div>
+          <div class="column has-text-centered">
+            <div class="publication-links">
+              <span class="link-block">
+                <a href="https://github.com/nwjang/psychosis-guard" target="_blank" class="external-link button is-normal is-rounded is-dark">
+                  <span class="icon"><i class="fab fa-github"></i></span><span>Code</span>
+                </a>
+              </span>
+              <span class="link-block">
+                <a href="https://pypi.org/project/psychosis-guard/" target="_blank" class="external-link button is-normal is-rounded is-dark">
+                  <span class="icon"><i class="fab fa-python"></i></span><span>PyPI</span>
+                </a>
+              </span>
+              <span class="link-block">
+                <a href="https://github.com/nwjang/psychosis-guard/tree/main/docs" target="_blank" class="external-link button is-normal is-rounded is-dark">
+                  <span class="icon"><i class="fas fa-book"></i></span><span>Docs</span>
+                </a>
+              </span>
+              <span class="link-block">
+                <a href="https://arxiv.org/abs/2509.10970" target="_blank" class="external-link button is-normal is-rounded is-dark">
+                  <span class="icon"><i class="ai ai-arxiv"></i></span><span>psychosis-bench</span>
+                </a>
+              </span>
+              <span class="link-block">
+                <a href="https://github.com/nwjang/psychosis-guard/blob/main/README.ko.md" target="_blank" class="external-link button is-normal is-rounded is-dark">
+                  <span>한국어</span>
+                </a>
+              </span>
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
   </div>
-</header>
+</section>
 
-<main>
+<!-- Teaser -->
+<section class="hero teaser">
+  <div class="container is-max-desktop">
+    <div class="hero-body">
+      <img src="assets/architecture.png" alt="psychosis-guard 5-stage pipeline: input rail, dialog rail, output rail, trajectory rail, action rail">
+      <h2 class="subtitle has-text-centered">
+        <b>AI safety shouldn't reset every turn.</b>
+        Every user turn passes through five rail stages. Stages 1–3 and 5 mirror the input, dialog, output and action rails of NVIDIA NeMo Guardrails.
+        Stage 4, the <b>Trajectory Rail</b>, is new: it tracks cumulative risk over the whole conversation and escalates a graduated intervention when the conversation is heading the wrong way, even when every individual turn looks harmless.
+      </h2>
+    </div>
+  </div>
+</section>
 
-<p>A chatbot can validate a user's delusional belief a little more on every turn while no single message ever trips a content filter. Conventional guardrails inspect one message at a time; the harm here is cumulative.</p>
-<p>psychosis-guard tracks the whole conversation, scores where it is heading, and steps in with a graduated intervention before that drift compounds. It runs as an OpenAI-compatible HTTP proxy in front of any chatbot, as a Python library, or in a check-only mode over replies your application already has. Without an API key, the whole pipeline runs on deterministic mocks.</p>
+<!-- Abstract -->
+<section class="section hero is-light">
+  <div class="container is-max-desktop">
+    <div class="columns is-centered has-text-centered">
+      <div class="column is-four-fifths">
+        <h2 class="title is-3">Abstract</h2>
+        <div class="content has-text-justified">
+          <p>
+            A chatbot can validate a user's delusional belief a little more on every turn while no single
+            message ever trips a content filter. Conventional guardrails inspect one message at a time; the
+            harm here is cumulative. We present psychosis-guard, open-source safety middleware that adds a
+            <em>Trajectory Rail</em> to the standard input / dialog / output / action rail pipeline. The rail
+            folds every turn into cumulative state, computes the least-squares slope of delusion density across
+            the conversation, and raises composite risk only when that trajectory is escalating. Risk maps to a
+            graduated, clinically informed intervention rather than a binary block: a grounding question at
+            LOW, an honest alternative explanation at MEDIUM, de-escalation and referral at HIGH.
+            The middleware is model-agnostic: it runs as an OpenAI-compatible HTTP proxy in front of any chatbot,
+            as a Python library, or in a check-only mode over replies the application already produced, and it
+            degrades to deterministic behaviour whenever a judge or rewriter call fails. On psychosis-bench,
+            stacking psychosis-guard on a safety system prompt gives the best score on every metric, and a paired
+            ablation attributes most of the gain over a turn-local pipeline to the Trajectory Rail itself.
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
 
-<h2>How it works</h2>
-<p>Every user turn passes through five rail stages. Stages 1–3 and 5 mirror the input, dialog, output and action rails of NVIDIA NeMo Guardrails. Stage 4 is new: it carries state across the conversation.</p>
-<figure>
-  <img src="assets/architecture.png" alt="Five-stage pipeline: input rail, dialog rail, output rail, trajectory rail, action rail">
-</figure>
-<ul style="margin-top:20px">
-  <li><b>Input rail.</b> Pre-response risk estimate from the user turn plus the prior trajectory slope. HIGH short-circuits the chatbot.</li>
-  <li><b>Dialog rail.</b> Mode A injects a graduated system prompt into the chatbot call.</li>
-  <li><b>Output rail.</b> A judge scores the reply: reinforcement, sycophancy, pushback, escalation, help-referral.</li>
-  <li><b>Trajectory rail.</b> Folds the turn into cumulative state and computes the least-squares slope of delusion density over the conversation.</li>
-  <li><b>Action rail.</b> Composite risk becomes NONE, LOW, MEDIUM or HIGH. Mode B rewrites the reply.</li>
-</ul>
-<div class="formula">risk = Σ wᵢ · signalᵢ + slope_boost · max(slope, 0)</div>
-<p>Only an escalating trajectory raises risk; a falling slope is not rewarded, so interventions do not switch off while density is still high. The intervention is graduated rather than binary: a grounding question at LOW, an honest alternative explanation at MEDIUM, de-escalation and referral at HIGH. Thresholds and weights live in YAML.</p>
+<!-- Method -->
+<section class="section hero is-small">
+  <div class="container is-max-desktop">
+    <div class="columns is-centered">
+      <div class="column is-full">
+        <div class="content">
+          <h2 class="title is-3">How it works</h2>
+          <div class="level-set has-text-justified">
+            <ol>
+              <li><b>Input Rail.</b> Pre-response risk estimate from the user turn plus the prior trajectory slope. HIGH short-circuits the chatbot and returns a safe response.</li>
+              <li><b>Dialog Rail.</b> Mode A injects a graduated system prompt into the chatbot call.</li>
+              <li><b>Output Rail.</b> A judge scores the reply: reinforcement, sycophancy, pushback, escalation, help-referral.</li>
+              <li><b>Trajectory Rail.</b> Folds the turn into cumulative state and computes the least-squares slope of delusion density over the conversation.</li>
+              <li><b>Action Rail.</b> Composite risk becomes <code>NONE / LOW / MEDIUM / HIGH</code>. Mode B rewrites the reply.</li>
+            </ol>
+            <div class="formula">composite_risk = Σ wᵢ · signalᵢ + slope_boost · max(slope, 0)</div>
+            <p>
+              Only an <em>escalating</em> trajectory raises risk. A falling slope is not rewarded, so interventions do
+              not switch off while density is still high. Thresholds, signal weights, <code>slope_boost</code> and the
+              look-back window live in YAML, outside the code. psychosis-guard is complementary to content rails: it
+              slots behind or beside them rather than replacing them.
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
 
-<h2>Results in detail</h2>
-<p>Every turn is scored with the benchmark's own LLM-judge rubric. DCS is delusion confirmation (0–2, lower is better), HES harm enablement (0–2, lower is better), SIS whether a safety intervention was offered (0–1, higher is better). Mean ± 95% CI over the 16 cases.</p>
-<div class="wide">
-<table>
-  <thead><tr><th>Target</th><th class="n">DCS ↓</th><th class="n">HES ↓</th><th class="n">SIS ↑</th></tr></thead>
-  <tbody>
-    <tr><td>Unguarded chatbot</td><td class="n">1.17 <span class="ci">± 0.23</span></td><td class="n">0.79 <span class="ci">± 0.18</span></td><td class="n">0.15 <span class="ci">± 0.13</span></td></tr>
-    <tr><td>+ safety system prompt</td><td class="n">0.74 <span class="ci">± 0.15</span></td><td class="n">0.33 <span class="ci">± 0.18</span></td><td class="n">0.76 <span class="ci">± 0.18</span></td></tr>
-    <tr><td>psychosis-guard, trajectory rail off</td><td class="n">0.98 <span class="ci">± 0.13</span></td><td class="n">0.72 <span class="ci">± 0.17</span></td><td class="n">0.20 <span class="ci">± 0.17</span></td></tr>
-    <tr><td>psychosis-guard, mode B</td><td class="n">0.82 <span class="ci">± 0.10</span></td><td class="n">0.39 <span class="ci">± 0.17</span></td><td class="n">0.89 <span class="ci">± 0.14</span></td></tr>
-    <tr><td>psychosis-guard, combined</td><td class="n">0.85 <span class="ci">± 0.09</span></td><td class="n">0.40 <span class="ci">± 0.16</span></td><td class="n">0.74 <span class="ci">± 0.21</span></td></tr>
-    <tr class="best"><td>Safety prompt + psychosis-guard</td><td class="n">0.58 <span class="ci">± 0.18</span></td><td class="n">0.19 <span class="ci">± 0.15</span></td><td class="n">0.87 <span class="ci">± 0.11</span></td></tr>
-  </tbody>
-</table>
-</div>
-<figure>
-  <img src="eval/psybench_bars.png" alt="DCS, HES and SIS per target with 95% CI" loading="lazy">
-  <figcaption>DCS, HES and SIS per target with 95% CI. Run 2026-09-07.</figcaption>
-</figure>
-<ul style="margin-top:24px">
-  <li>Against the unguarded chatbot, mode B and combined improve all three metrics (paired Wilcoxon, Holm-corrected, d = 0.8–2.1, p &lt; .02) and eliminate every full-validation and full-compliance turn.</li>
-  <li>Against the identical pipeline with the trajectory rail off, the rail alone accounts for DCS −0.16, HES −0.33, SIS +0.69 (p &lt; .05).</li>
-  <li>The middleware is statistically indistinguishable from a one-paragraph safety system prompt, obtained without access to the chatbot's prompt. Stacking the two is the best row on every metric.</li>
-  <li>0 interventions in 520 turns of benign control conversations.</li>
-</ul>
-<div class="note">
-  <p><b>What this does not show.</b> These are scores on the chatbot's replies to a fixed script. In a separate reactive simulation, where an LLM-played user adjusts the next message to the reply, the simulated user's delusion density and conviction do not improve, and the interventions that insert the most safety language make that user worse. The simulator is unvalidated and the judge is an LLM checked only against another LLM (κ ≈ 0.5). Treat the table as a bot-side benchmark, not evidence of user outcomes.</p>
-</div>
+<!-- Results -->
+<section class="section hero is-small">
+  <div class="container is-max-desktop">
+    <div class="columns is-centered">
+      <div class="column is-full">
+        <div class="content">
+          <h2 class="title is-3">Results on psychosis-bench</h2>
+          <div class="level-set has-text-justified">
+            <p>
+              We evaluate on <a href="https://arxiv.org/abs/2509.10970" target="_blank">psychosis-bench</a> (Dohnány et al., 2025),
+              a public benchmark of 16 scripted 12-turn conversations that progress from loneliness to a delusional
+              belief to a harmful act. Every turn is scored with the benchmark's own LLM-judge rubric:
+              <b>DCS</b> delusion confirmation (0–2, lower is better), <b>HES</b> harm enablement (0–2, lower is better),
+              <b>SIS</b> whether a safety intervention was offered (0–1, higher is better). All targets use the same chatbot
+              (<code>gpt-4o-mini</code>, temperature 0.7), judge and user script, so the contrasts are like-for-like.
+              n = 16, one repetition, mean ± 95% CI.
+            </p>
+          </div>
+          <div class="table-container">
+            <table class="table is-striped is-fullwidth">
+              <thead><tr><th>Target</th><th class="num">DCS ↓</th><th class="num">HES ↓</th><th class="num">SIS ↑</th></tr></thead>
+              <tbody>
+                <tr><td>unguarded chatbot</td><td class="num">1.17 <span class="ci">± 0.23</span></td><td class="num">0.79 <span class="ci">± 0.18</span></td><td class="num">0.15 <span class="ci">± 0.13</span></td></tr>
+                <tr><td>+ one-paragraph safety system prompt</td><td class="num">0.74 <span class="ci">± 0.15</span></td><td class="num">0.33 <span class="ci">± 0.18</span></td><td class="num">0.76 <span class="ci">± 0.18</span></td></tr>
+                <tr><td>psychosis-guard, Trajectory Rail <b>off</b> (turn-local)</td><td class="num">0.98 <span class="ci">± 0.13</span></td><td class="num">0.72 <span class="ci">± 0.17</span></td><td class="num">0.20 <span class="ci">± 0.17</span></td></tr>
+                <tr><td>psychosis-guard, <code>B</code> (rail + rewrite)</td><td class="num">0.82 <span class="ci">± 0.10</span></td><td class="num">0.39 <span class="ci">± 0.17</span></td><td class="num"><b>0.89</b> <span class="ci">± 0.14</span></td></tr>
+                <tr><td>psychosis-guard, <code>combined</code></td><td class="num">0.85 <span class="ci">± 0.09</span></td><td class="num">0.40 <span class="ci">± 0.16</span></td><td class="num">0.74 <span class="ci">± 0.21</span></td></tr>
+                <tr class="best"><td>safety system prompt + psychosis-guard <code>combined</code></td><td class="num">0.58 <span class="ci">± 0.18</span></td><td class="num">0.19 <span class="ci">± 0.15</span></td><td class="num">0.87 <span class="ci">± 0.11</span></td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
 
-<h2>Get started</h2>
+<section class="hero is-small">
+  <div class="hero-body">
+    <div class="container is-max-desktop">
+      <div class="results-figure">
+        <img src="eval/psybench_heatmap.png" alt="Share of the ideal score per target, all / explicit / implicit cases">
+        <h2 class="subtitle has-text-centered">
+          <em><b>Share of the ideal score per target.</b></em> Over all 16 cases, and split by explicit and implicit scripts.
+          The safety prompt and the middleware each help; stacked, they are the best row on every metric.
+        </h2>
+      </div>
+      <div class="results-figure" style="margin-top:2.5rem">
+        <img src="eval/psybench_bars.png" alt="DCS, HES and SIS per target with 95% CI">
+        <h2 class="subtitle has-text-centered">
+          <em><b>DCS, HES and SIS per target with 95% CI.</b></em> The turn-local ablation (Trajectory Rail off) is
+          close to the unguarded chatbot; the same pipeline with the rail on is not.
+        </h2>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="section hero is-small">
+  <div class="container is-max-desktop">
+    <div class="columns is-centered">
+      <div class="column is-full">
+        <div class="content">
+          <div class="level-set has-text-justified">
+            <p>Paired Wilcoxon on the 16 matched cases, Holm-corrected:</p>
+            <ul>
+              <li><b>vs the unguarded chatbot</b>, <code>B</code> and <code>combined</code> improve all three metrics (d = 0.8–2.1, all p &lt; .02) and eliminate every full-validation (DCS = 2) and full-compliance (HES = 2) turn.</li>
+              <li><b>Trajectory Rail ablation.</b> <code>B</code> vs the same pipeline with the rail off differs only in the rail; the rail accounts for DCS −0.16, HES −0.33, SIS +0.69 (all p &lt; .05). Turn-local scoring under-calls risk on a slowly escalating script, so the rewriter fires at the wrong level.</li>
+              <li><b>vs a safety system prompt alone</b>, the middleware is statistically indistinguishable: parity, obtained without access to the chatbot's prompt. Stacking the two is the best row on every metric.</li>
+              <li><b>Utility.</b> 0 interventions in 520 turns of benign control conversations.</li>
+            </ul>
+            <div class="notification is-warning is-light">
+              <b>What this does not show.</b> These are scores on the chatbot's replies to a fixed script. In a separate
+              reactive simulation, where an LLM-played user adjusts the next message to the reply, referral and pushback
+              rates rise just as here, but the simulated user's delusion density and conviction do not improve, and the
+              interventions that insert the most safety language make that simulated user <em>worse</em>. That simulator is
+              unvalidated and the judge is an LLM checked only against another LLM (κ ≈ 0.5). Treat the table as a
+              bot-side benchmark, not evidence of user outcomes. Three repetitions and human judge labels are the planned next step.
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Getting started -->
+<section class="section hero is-light">
+  <div class="container is-max-desktop">
+    <div class="columns is-centered">
+      <div class="column is-full">
+        <div class="content">
+          <h2 class="title is-3">Getting started</h2>
+          <p>The core library runs on deterministic mocks with no API key. Add an OpenAI, Anthropic, or any OpenAI-compatible endpoint (Ollama, vLLM, Groq, OpenRouter, …) to guard a real model.</p>
 <pre><code>pip install "psychosis-guard[server,openai,anthropic]"</code></pre>
 <pre><code>from psychosis_guard import PsychosisGuard
 
-guard = PsychosisGuard.from_config("config.yml")   # mocks, no API key
+guard = PsychosisGuard.from_config("config.yml")     # deterministic mocks, no API key
 reply = guard.send("Lately I keep noticing patterns that feel like signals meant for me.")
-guard.log[-1].level.name                            # NONE | LOW | MEDIUM | HIGH</code></pre>
-<pre><code>psychosis-guard serve    # OpenAI-compatible proxy on :8080</code></pre>
-<p style="margin-top:16px">Point any OpenAI SDK at <code>http://localhost:8080/v1</code>; the reply carries an <code>X-Guard-Level</code> header. See the <a href="https://github.com/nwjang/psychosis-guard/blob/main/docs/http-api.md">HTTP API</a>, <a href="https://github.com/nwjang/psychosis-guard/blob/main/docs/configuration.md">configuration</a> and <a href="https://github.com/nwjang/psychosis-guard/blob/main/docs/architecture.md">architecture</a> docs.</p>
+print(guard.log[-1].level.name, guard.summary()["delusion_slope"])</code></pre>
+<pre><code>psychosis-guard serve      # OpenAI-compatible proxy on :8080; point any OpenAI SDK at /v1
+                           # each reply carries X-Guard-Level: NONE | LOW | MEDIUM | HIGH</code></pre>
+          <p>
+            Reference: <a href="https://github.com/nwjang/psychosis-guard/blob/main/docs/http-api.md">HTTP API</a> ·
+            <a href="https://github.com/nwjang/psychosis-guard/blob/main/docs/configuration.md">Configuration</a> ·
+            <a href="https://github.com/nwjang/psychosis-guard/blob/main/docs/architecture.md">Architecture</a> ·
+            <a href="https://github.com/nwjang/psychosis-guard/tree/main/examples">Examples</a>
+          </p>
+          <p class="is-size-7">
+            <b>Disclaimer.</b> Research / educational tool. <b>Not a medical device, not diagnosis or crisis support.</b>
+            In an emergency contact local emergency services or a crisis line. Intervention copy and prompts are marked
+            <code>ADVISER-REVIEW</code> in the source and must be reviewed by a mental-health professional before use with real users.
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
 
-<h2>Disclaimer</h2>
-<p class="small">Research and educational tool. Not a medical device, not diagnosis or crisis support. In an emergency contact local emergency services or a crisis line. Intervention copy and prompts are marked <code>ADVISER-REVIEW</code> in the source and must be reviewed by a mental-health professional before use with real users.</p>
-
-<h2>Citation</h2>
+<!-- BibTeX -->
+<section class="section" id="BibTeX">
+  <div class="container is-max-desktop content">
+    <h2 class="title">BibTeX</h2>
 <pre><code>@software{psychosis_guard_2026,
-  title  = {psychosis-guard: trajectory-aware safety middleware for LLM conversations},
-  author = {Jang, Namwoo},
-  year   = {2026},
-  url    = {https://github.com/nwjang/psychosis-guard}
+  title   = {psychosis-guard: Trajectory-Aware Safety Middleware for Long-Running LLM Conversations},
+  author  = {Jang, Namwoo},
+  year    = {2026},
+  url     = {https://github.com/nwjang/psychosis-guard},
+  license = {Apache-2.0}
 }</code></pre>
+  </div>
+</section>
 
-<footer>Namwoo Jang. Apache License 2.0. Independent clean-room implementation, architecturally inspired by NVIDIA NeMo Guardrails; contains no NeMo source code. <a href="https://github.com/nwjang/psychosis-guard/blob/main/CONTRIBUTING.md">Contributing</a> · <a href="https://github.com/nwjang/psychosis-guard/blob/main/CHANGELOG.md">Changelog</a></footer>
+<footer class="footer">
+  <div class="container">
+    <div class="columns is-centered">
+      <div class="column is-8">
+        <div class="content">
+          <p>
+            Apache License 2.0. Independent clean-room implementation, architecturally inspired by NVIDIA NeMo Guardrails; contains no NeMo source code.
+            Benchmark: Dohnány et al., <a href="https://arxiv.org/abs/2509.10970">psychosis-bench</a>, 2025.
+          </p>
+          <p>
+            Page layout follows the <a href="https://github.com/eliahuhorwitz/Academic-project-page-template" target="_blank">Academic Project Page Template</a>,
+            adopted from the <a href="https://nerfies.github.io" target="_blank">Nerfies</a> project page.
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
+</footer>
 
-</main>
 </body>
 </html>
