@@ -58,12 +58,12 @@
     .cmp-user .q { display: inline-block; max-width: 760px; background: #3a3a3c; color: #fff; border-radius: 20px; padding: 12px 18px; font-size: 1.05rem; line-height: 1.4; text-align: left; }
     .cmp-replies { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; align-items: stretch; }
     .cmp-reply { background: #1d1d1f; border-radius: 18px; padding: 18px 20px 16px; font-size: .95rem; line-height: 1.5; color: #d2d2d7; display: flex; flex-direction: column; }
-    .cmp-reply .hd { font-size: 1.05rem; font-weight: 600; color: #f5f5f7; letter-spacing: -.015em; display: flex; align-items: center; gap: 8px; }
+    .cmp-reply .hd { font-size: 1.05rem; font-weight: 600; color: #f5f5f7; letter-spacing: -.015em; display: flex; align-items: center; gap: 8px; margin-bottom: 12px; }
     .cmp-reply .hd .dot { width: 10px; height: 10px; border-radius: 50%; display: inline-block; }
     .cmp-reply.bad .hd .dot { background: #ff453a; } .cmp-reply.good .hd .dot { background: #30d158; }
     .cmp-reply .sub { font-size: .75rem; color: #86868b; margin: 2px 0 14px; }
     .cmp-reply .body { flex: 1; }
-    .cmp-reply p { margin: 0 0 12px; white-space: pre-line; }
+    .cmp-reply p { margin: 0 0 12px; }
     .verdict { border-top: 1px solid #2c2c2e; padding-top: 12px; margin-top: 4px; }
     .verdict .v { font-weight: 600; font-size: .95rem; }
     .verdict .v.bad { color: #ff453a; } .verdict .v.mid { color: #ffd60a; } .verdict .v.good { color: #30d158; }
@@ -149,23 +149,16 @@
         <div class="cmp-user"><span class="t" id="turnLabel"></span><span class="q" id="userMsg"></span></div>
         <div class="cmp-replies">
           <div class="cmp-reply bad">
-            <div class="hd"><span class="dot"></span>Without psychosis-guard</div><div class="sub">gpt-4o-mini, as shipped</div>
+            <div class="hd"><span class="dot"></span>Without psychosis-guard</div>
             <div class="body"><p id="baseReply"></p></div>
-            <div class="verdict"><div class="v" id="baseVerdict"></div><div class="s" id="baseScore"></div></div>
+            <div class="verdict"><div class="v" id="baseVerdict"></div></div>
           </div>
           <div class="cmp-reply good">
-            <div class="hd"><span class="dot"></span>With psychosis-guard</div><div class="sub">same gpt-4o-mini, middleware in front of it, no safety prompt</div>
-            <div class="why" id="why"></div>
-            <div class="draft" id="draft" hidden></div>
-            <div class="body"><div class="final">REPLY THE USER SEES</div><p id="guardReply"></p></div>
-            <div class="verdict"><div class="v" id="guardVerdict"></div><div class="s" id="guardScore"></div></div>
+            <div class="hd"><span class="dot"></span>With psychosis-guard</div>
+            <div class="body"><p id="guardReply"></p></div>
+            <div class="verdict"><div class="v" id="guardVerdict"></div></div>
           </div>
         </div>
-        <div class="strips">
-          <div class="strip"><div class="lbl"><span>Without · did the reply confirm the delusion? turns 1–12</span></div><div class="cells" id="baseCells"></div></div>
-          <div class="strip"><div class="lbl"><span>With · did the reply confirm the delusion? turns 1–12</span></div><div class="cells" id="guardCells"></div></div>
-        </div>
-        <div class="cmp-key"><span class="k" style="background:#30d158"></span>no <span class="k" style="background:#ffd60a"></span>partly <span class="k" style="background:#ff453a"></span>fully <span class="k" style="background:#3a3a3c"></span>not scored yet. Click any square to open that turn. Three of the 16 psychosis-bench cases, transcripts unedited; the benchmark's own LLM judge scored every turn.</div>
       </div>
       <script>
       (function(){
@@ -195,33 +188,29 @@
             b.innerHTML='<span class="t">'+esc(c.title)+'</span><span class="g">'+esc(c.tag)+' · '+esc(c.harm)+'</span>';
             b.onclick=function(){ ci=i; ti=c.start; render(); }; el.appendChild(b); });
         }
+        function excerpt(txt){
+          var x=txt.replace(/\s+/g,' ').trim();
+          var m=x.match(/^(.+?[.!?])\s(.+?[.!?])(\s|$)/);
+          x = m ? m[1]+' '+m[2] : x;
+          if (x.length>260) x=x.slice(0,260).replace(/\s\S*$/,'')+'…';
+          return x + (x.length < txt.trim().length ? ' …' : '');
+        }
         function render(){
           var c=CASES[ci], t=c.turns[ti];
-          seg(); cells('baseCells',c.turns,'bs'); cells('guardCells',c.turns,'gs');
-          $('turnLabel').textContent='PSYCHOSIS-BENCH CASE '+c.num+' · TURN '+(ti+1)+' OF 12 · USER';
+          seg();
+          $('turnLabel').textContent='TURN '+(ti+1)+' · USER';
           $('userMsg').textContent='“'+t.u+'”';
-          $('baseReply').textContent=t.b; $('guardReply').textContent=t.g;
-          var v=verdict(t.bs); $('baseVerdict').textContent=v[0]; $('baseVerdict').className='v '+v[1]; $('baseScore').textContent=v[2];
-          v=verdict(t.gs); $('guardVerdict').textContent=v[0]; $('guardVerdict').className='v '+v[1]; $('guardScore').textContent=v[2];
-          var why;
-          if (t.short) why='The user message alone scored <b>HIGH</b>: the chatbot was not called, a safe response was returned.';
-          else {
-            var trend = t.slope>0.02 ? 'the conversation trending toward delusion' : 'the risk in this turn';
-            var act = t.modeb==='applied' ? 'rewrote the reply' : (t.lvl==='NONE' ? 'left the reply alone' : 'left the reply as it was, since the chatbot already pushed back');
-            why='psychosis-guard saw '+trend+' (risk '+t.risk.toFixed(2)+', <b class="lvl '+t.lvl+'">'+t.lvl+'</b>)'+(t.modea?', steered the chatbot with a graduated safety prompt':'')+' and <b>'+act+'</b>.';
-          }
-          $('why').innerHTML=why;
-          var d=$('draft');
-          if (t.d && t.modeb==='applied'){ var x=t.d.replace(/\s+/g,' '); x=x.length>200? x.slice(0,200)+'…' : x; d.innerHTML='<b>The chatbot wanted to say:</b> <s>'+esc(x)+'</s>'; d.hidden=false; } else { d.hidden=true; }
+          $('baseReply').textContent=excerpt(t.b); $('guardReply').textContent=excerpt(t.g);
+          var v=verdict(t.bs); $('baseVerdict').textContent=v[0]; $('baseVerdict').className='v '+v[1];
+          v=verdict(t.gs); $('guardVerdict').textContent=v[0]; $('guardVerdict').className='v '+v[1];
         }
         render();
       })();
       </script>
       <h2 class="subtitle has-text-centered">
         <b>AI safety shouldn't reset every turn.</b>
-        Three psychosis-bench conversations, same gpt-4o-mini with and without psychosis-guard in front of it.
-        No single reply from the unguarded chatbot would trip a content filter, yet by the end it is cheering the user on.
-        The middleware tracks where the conversation is heading and steps in with a graduated response.
+        Same gpt-4o-mini, with and without psychosis-guard in front of it, on three psychosis-bench conversations.
+        No single unguarded reply would trip a content filter; by the end, the chatbot is cheering the user on.
       </h2>
     </div>
   </div>
