@@ -1,0 +1,415 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>psychosis-guard</title>
+<meta name="description" content="Trajectory-aware safety middleware for long-running LLM conversations. Tracks cumulative risk across a whole conversation and steps in with a graduated intervention before delusional drift compounds.">
+<meta property="og:title" content="psychosis-guard">
+<meta property="og:description" content="AI safety shouldn't reset every turn. Trajectory-aware safety middleware for LLM chatbots.">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://nwjang.github.io/psychosis-guard/">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;0,6..72,600;1,6..72,400&family=Source+Sans+3:ital,wght@0,400;0,600;1,400&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+:root{
+  --bg:#F6F7F5; --bg-2:#EEF0EC; --plate:#FFFFFF;
+  --ink:#161B22; --ink-2:#3C444D; --muted:#5C6670; --rule:#D5DAD4; --rule-2:#E4E8E2;
+  --accent:#0E7C66; --accent-soft:#DCEFE9; --accent-ink:#0A5C4C;
+  --low:#B7860B; --medium:#C9601E; --high:#B0322B;
+  --code-bg:#EEF0EC;
+  --display:"Newsreader",Georgia,"Times New Roman",serif;
+  --body:"Source Sans 3","Source Sans Pro",-apple-system,"Segoe UI",Helvetica,Arial,sans-serif;
+  --mono:"IBM Plex Mono",ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;
+  --measure:44rem; --wide:62rem;
+  color-scheme:light;
+}
+@media (prefers-color-scheme:dark){
+  :root:not([data-theme="light"]){
+    --bg:#0F1316; --bg-2:#161C21; --plate:#FFFFFF;
+    --ink:#E7EAE6; --ink-2:#C4CAC6; --muted:#98A2AB; --rule:#2A3239; --rule-2:#20272D;
+    --accent:#3FBF9E; --accent-soft:#12302A; --accent-ink:#7DDCC2;
+    --low:#D9A83A; --medium:#E0793B; --high:#D9564D;
+    --code-bg:#161C21;
+    color-scheme:dark;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#0F1316; --bg-2:#161C21; --plate:#FFFFFF;
+  --ink:#E7EAE6; --ink-2:#C4CAC6; --muted:#98A2AB; --rule:#2A3239; --rule-2:#20272D;
+  --accent:#3FBF9E; --accent-soft:#12302A; --accent-ink:#7DDCC2;
+  --low:#D9A83A; --medium:#E0793B; --high:#D9564D;
+  --code-bg:#161C21;
+  color-scheme:dark;
+}
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--body);font-size:1.0625rem;line-height:1.6;font-feature-settings:"kern","liga"}
+a{color:var(--accent-ink);text-decoration:underline;text-decoration-thickness:1px;text-underline-offset:.15em}
+a:hover{color:var(--accent)}
+:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+code,pre,kbd{font-family:var(--mono);font-size:.875em}
+code{background:var(--code-bg);padding:.05em .35em;border-radius:3px}
+pre{background:var(--code-bg);border:1px solid var(--rule-2);padding:1rem 1.1rem;overflow-x:auto;line-height:1.5;border-radius:4px;margin:0}
+pre code{background:none;padding:0;font-size:.8125rem}
+h1,h2,h3{font-family:var(--display);font-weight:500;line-height:1.15;text-wrap:balance;margin:0}
+h2{font-size:1.75rem;margin-top:3.5rem;margin-bottom:.9rem;letter-spacing:-.005em}
+h3{font-size:1.2rem;margin-top:1.8rem;margin-bottom:.4rem}
+p{margin:0 0 1rem}
+.wrap{max-width:var(--measure);margin:0 auto;padding:0 1.25rem}
+.wide{max-width:var(--wide);margin:0 auto;padding:0 1.25rem}
+.eyebrow{font-family:var(--mono);font-size:.72rem;letter-spacing:.12em;text-transform:uppercase;color:var(--muted)}
+
+/* title block */
+header.title{padding:4.5rem 0 2rem;text-align:center}
+header.title .eyebrow{margin-bottom:1.2rem}
+header.title h1{font-size:clamp(2.4rem,6vw,3.8rem);font-weight:500;letter-spacing:-.015em}
+header.title h1 .tag{display:block;font-family:var(--display);font-style:italic;font-weight:400;font-size:clamp(1.25rem,3vw,1.6rem);color:var(--ink-2);margin-top:.5rem;letter-spacing:0}
+header.title .sub{font-size:1.15rem;color:var(--ink-2);max-width:36rem;margin:1.4rem auto 0;text-wrap:balance}
+.authors{margin-top:1.6rem;font-size:1.05rem}
+.authors .aff{color:var(--muted);font-size:.95rem;margin-top:.15rem}
+.links{display:flex;flex-wrap:wrap;justify-content:center;gap:.5rem;margin-top:1.6rem}
+.links a{display:inline-flex;align-items:center;gap:.45rem;border:1px solid var(--rule);border-radius:999px;padding:.4rem .95rem;font-size:.9rem;text-decoration:none;color:var(--ink);background:transparent;line-height:1}
+.links a:hover{border-color:var(--accent);color:var(--accent-ink)}
+.links a.primary{background:var(--ink);color:var(--bg);border-color:var(--ink)}
+.links a.primary:hover{background:var(--accent);border-color:var(--accent);color:#fff}
+.links svg{width:14px;height:14px;fill:currentColor}
+
+/* teaser */
+figure{margin:0}
+figure.teaser{margin:2.5rem auto 0;border-top:1px solid var(--rule);border-bottom:1px solid var(--rule);padding:1.6rem 0 1.2rem}
+figure.teaser svg{display:block;width:100%;height:auto;max-width:900px;margin:0 auto}
+figcaption{font-size:.9rem;color:var(--muted);line-height:1.5;max-width:var(--measure);margin:.9rem auto 0}
+figcaption b{color:var(--ink-2);font-weight:600}
+.svg-label{font-family:var(--mono);font-size:11px;fill:var(--muted)}
+.svg-label.strong{fill:var(--ink);font-weight:500}
+.svg-axis{stroke:var(--rule);stroke-width:1}
+.svg-bar{fill:var(--accent);opacity:.55}
+.svg-bar.late{opacity:.85}
+.svg-thresh{stroke:var(--high);stroke-width:1.2;stroke-dasharray:4 4}
+.svg-slope{stroke:var(--ink);stroke-width:2}
+.svg-lvl-none{fill:var(--rule)}
+.svg-lvl-low{fill:var(--low)}
+.svg-lvl-med{fill:var(--medium)}
+.svg-lvl-high{fill:var(--high)}
+
+/* headline numbers */
+.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:0;border:1px solid var(--rule);margin:2rem 0 0;border-radius:4px;overflow:hidden}
+.stat{padding:1.1rem 1.25rem;border-left:1px solid var(--rule)}
+.stat:first-child{border-left:0}
+.stat .n{font-family:var(--display);font-size:2.4rem;font-weight:500;line-height:1;color:var(--ink);font-variant-numeric:tabular-nums;display:flex;align-items:baseline;gap:.5rem}
+.stat .n .from{font-family:var(--mono);font-size:.85rem;color:var(--muted);font-weight:400}
+.stat .l{font-size:.9rem;color:var(--ink-2);margin-top:.5rem;line-height:1.35}
+.stats-note{font-size:.85rem;color:var(--muted);margin-top:.6rem}
+@media (max-width:640px){.stats{grid-template-columns:1fr}.stat{border-left:0;border-top:1px solid var(--rule)}.stat:first-child{border-top:0}}
+
+/* abstract */
+.abstract{margin-top:2.75rem}
+.abstract p{font-size:1.125rem;line-height:1.65}
+.abstract p:first-of-type::first-letter{font-family:var(--display);font-size:1.15em;font-weight:600}
+
+/* pipeline */
+.pipeline{display:grid;grid-template-columns:repeat(5,1fr);gap:.5rem;margin:1.4rem 0 .6rem;counter-reset:stage}
+.stage{border:1px solid var(--rule);border-radius:4px;padding:.9rem .9rem .95rem;background:transparent;position:relative;min-height:9.5rem;display:flex;flex-direction:column;gap:.35rem}
+.stage::before{counter-increment:stage;content:"Stage " counter(stage);font-family:var(--mono);font-size:.68rem;letter-spacing:.1em;text-transform:uppercase;color:var(--muted)}
+.stage h4{margin:0;font-family:var(--body);font-weight:600;font-size:.95rem;line-height:1.25}
+.stage p{margin:0;font-size:.85rem;line-height:1.4;color:var(--ink-2)}
+.stage.star{border-color:var(--accent);background:var(--accent-soft)}
+.stage.star::before{color:var(--accent-ink)}
+.stage.star::after{content:"★ new";position:absolute;top:.75rem;right:.8rem;font-family:var(--mono);font-size:.68rem;color:var(--accent-ink);letter-spacing:.05em}
+.pipe-note{font-size:.85rem;color:var(--muted)}
+@media (max-width:820px){.pipeline{grid-template-columns:repeat(2,1fr)}.stage{min-height:0}}
+@media (max-width:480px){.pipeline{grid-template-columns:1fr}}
+.formula{font-family:var(--mono);font-size:.95rem;background:var(--code-bg);border-left:2px solid var(--accent);padding:.7rem 1rem;margin:1.2rem 0;overflow-x:auto;white-space:nowrap}
+
+/* levels */
+.levels{display:grid;grid-template-columns:repeat(3,1fr);gap:.6rem;margin:1rem 0 0}
+.level{border-top:3px solid;padding:.6rem 0 0}
+.level .k{font-family:var(--mono);font-size:.72rem;letter-spacing:.12em;text-transform:uppercase}
+.level p{font-size:.9rem;margin:.25rem 0 0;color:var(--ink-2)}
+.level.low{border-color:var(--low)}.level.low .k{color:var(--low)}
+.level.medium{border-color:var(--medium)}.level.medium .k{color:var(--medium)}
+.level.high{border-color:var(--high)}.level.high .k{color:var(--high)}
+@media (max-width:560px){.levels{grid-template-columns:1fr}}
+
+/* tables */
+.tablewrap{overflow-x:auto;margin:1.2rem 0 .6rem}
+table{border-collapse:collapse;width:100%;font-size:.92rem;font-variant-numeric:tabular-nums}
+th,td{padding:.55rem .7rem;text-align:left;border-bottom:1px solid var(--rule-2);vertical-align:top}
+th{font-family:var(--mono);font-weight:500;font-size:.72rem;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);border-bottom:1px solid var(--rule)}
+td.num,th.num{text-align:right;font-family:var(--mono);font-size:.85rem;white-space:nowrap}
+tr.best td{font-weight:600}
+tr.best td.num{color:var(--accent-ink)}
+td .ci{color:var(--muted);font-weight:400}
+.compare td:first-child{font-weight:600;color:var(--ink-2)}
+
+/* figure plates (white PNGs) */
+.plate{background:var(--plate);border:1px solid var(--rule);border-radius:4px;padding:.75rem;margin:1.4rem 0 0}
+.plate img{display:block;width:100%;height:auto}
+
+/* findings list */
+ul.findings{padding-left:1.1rem;margin:0 0 1rem}
+ul.findings li{margin-bottom:.55rem}
+ul.findings li b{font-weight:600}
+
+/* caveat */
+.caveat{border:1px solid var(--rule);border-left:3px solid var(--medium);padding:1rem 1.2rem;border-radius:4px;margin:1.5rem 0}
+.caveat .eyebrow{color:var(--medium);margin-bottom:.4rem}
+.caveat p{margin:0;font-size:.98rem}
+.caveat p+p{margin-top:.6rem}
+
+/* code columns */
+.codegrid{display:grid;grid-template-columns:1fr 1fr;gap:.8rem;margin-top:1rem}
+.codegrid .eyebrow{margin-bottom:.4rem}
+@media (max-width:720px){.codegrid{grid-template-columns:1fr}}
+
+/* disclaimer */
+.disclaimer{border:1px solid var(--high);border-radius:4px;padding:1rem 1.2rem;margin-top:2.5rem;font-size:.95rem}
+.disclaimer .eyebrow{color:var(--high);margin-bottom:.3rem}
+.disclaimer p{margin:0}
+
+footer{margin-top:4rem;padding:2rem 0 3rem;border-top:1px solid var(--rule);font-size:.88rem;color:var(--muted)}
+footer .row{display:flex;flex-wrap:wrap;justify-content:space-between;gap:.5rem 1.5rem}
+footer a{color:var(--muted)}
+@media (prefers-reduced-motion:no-preference){
+  .links a{transition:border-color .15s,color .15s,background .15s}
+}
+</style>
+</head>
+<body>
+
+<header class="title wrap">
+  <div class="eyebrow">Open-source safety middleware · Apache 2.0 · v0.2</div>
+  <h1>psychosis-guard
+    <span class="tag">AI safety shouldn't reset every turn.</span>
+  </h1>
+  <p class="sub">Trajectory-aware safety middleware for long-running LLM conversations.</p>
+  <div class="authors">
+    <div>Namwoo Jang</div>
+    <div class="aff">Independent · <a href="https://github.com/nwjang/psychosis-guard">github.com/nwjang/psychosis-guard</a></div>
+  </div>
+  <nav class="links" aria-label="Project links">
+    <a class="primary" href="https://github.com/nwjang/psychosis-guard"><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z"/></svg>Code</a>
+    <a href="https://pypi.org/project/psychosis-guard/"><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M8 1 1.5 4.5v7L8 15l6.5-3.5v-7L8 1zm0 1.7 4.6 2.5L8 7.7 3.4 5.2 8 2.7zM3 6.4l4.3 2.3v4.6L3 11V6.4zm5.7 6.9V8.7L13 6.4V11l-4.3 2.3z"/></svg>PyPI</a>
+    <a href="https://github.com/nwjang/psychosis-guard/blob/main/docs/architecture.md">Architecture</a>
+    <a href="https://github.com/nwjang/psychosis-guard/blob/main/docs/http-api.md">HTTP API</a>
+    <a href="https://arxiv.org/abs/2509.10970">psychosis-bench ↗</a>
+    <a href="https://github.com/nwjang/psychosis-guard/blob/main/README.ko.md">한국어</a>
+  </nav>
+</header>
+
+<figure class="teaser wide">
+  <svg viewBox="0 0 900 300" role="img" aria-labelledby="teaser-title teaser-desc">
+    <title id="teaser-title">Per-turn delusion density across a 12-turn conversation</title>
+    <desc id="teaser-desc">Twelve bars, each under the single-turn threshold, while a fitted slope line rises across the conversation. The guard's level goes from NONE to LOW to MEDIUM to HIGH even though no single turn crosses the threshold.</desc>
+    <!-- axes -->
+    <line class="svg-axis" x1="60" y1="230" x2="860" y2="230"/>
+    <line class="svg-axis" x1="60" y1="40" x2="60" y2="230"/>
+    <text class="svg-label" x="52" y="234" text-anchor="end">0</text>
+    <text class="svg-label" x="52" y="140" text-anchor="end">0.5</text>
+    <text class="svg-label" x="52" y="46" text-anchor="end">1.0</text>
+    <text class="svg-label" x="60" y="26">delusion density, per user turn</text>
+    <!-- single-turn threshold -->
+    <line class="svg-thresh" x1="60" y1="96" x2="860" y2="96"/>
+    <text class="svg-label" x="858" y="90" text-anchor="end" style="fill:var(--high)">single-turn filter threshold · never crossed</text>
+    <!-- bars: turn i center x = 60 + 66.7*(i-0.5); density values (illustrative) -->
+    <g>
+      <rect class="svg-bar" x="80" y="211" width="28" height="19"/>
+      <rect class="svg-bar" x="147" y="215" width="28" height="15"/>
+      <rect class="svg-bar" x="213" y="200" width="28" height="30"/>
+      <rect class="svg-bar" x="280" y="203" width="28" height="27"/>
+      <rect class="svg-bar" x="347" y="185" width="28" height="45"/>
+      <rect class="svg-bar" x="413" y="176" width="28" height="54"/>
+      <rect class="svg-bar late" x="480" y="181" width="28" height="49"/>
+      <rect class="svg-bar late" x="547" y="160" width="28" height="70"/>
+      <rect class="svg-bar late" x="613" y="150" width="28" height="80"/>
+      <rect class="svg-bar late" x="680" y="146" width="28" height="84"/>
+      <rect class="svg-bar late" x="747" y="128" width="28" height="102"/>
+      <rect class="svg-bar late" x="813" y="118" width="28" height="112"/>
+    </g>
+    <!-- least-squares slope -->
+    <line class="svg-slope" x1="94" y1="216" x2="827" y2="120"/>
+    <text class="svg-label strong" x="700" y="112">least-squares slope ↗</text>
+    <!-- turn labels -->
+    <g class="svg-label">
+      <text x="94" y="248" text-anchor="middle">1</text>
+      <text x="161" y="248" text-anchor="middle">2</text>
+      <text x="227" y="248" text-anchor="middle">3</text>
+      <text x="294" y="248" text-anchor="middle">4</text>
+      <text x="361" y="248" text-anchor="middle">5</text>
+      <text x="427" y="248" text-anchor="middle">6</text>
+      <text x="494" y="248" text-anchor="middle">7</text>
+      <text x="561" y="248" text-anchor="middle">8</text>
+      <text x="627" y="248" text-anchor="middle">9</text>
+      <text x="694" y="248" text-anchor="middle">10</text>
+      <text x="761" y="248" text-anchor="middle">11</text>
+      <text x="827" y="248" text-anchor="middle">12</text>
+      <text x="860" y="248" text-anchor="end" dy="16">turn</text>
+    </g>
+    <!-- guard level strip -->
+    <text class="svg-label" x="52" y="282" text-anchor="end">guard level</text>
+    <g>
+      <rect class="svg-lvl-none" x="62" y="272" width="196" height="12" rx="2"/>
+      <rect class="svg-lvl-low" x="262" y="272" width="196" height="12" rx="2"/>
+      <rect class="svg-lvl-med" x="462" y="272" width="196" height="12" rx="2"/>
+      <rect class="svg-lvl-high" x="662" y="272" width="196" height="12" rx="2"/>
+      <text class="svg-label" x="160" y="298" text-anchor="middle">NONE</text>
+      <text class="svg-label" x="360" y="298" text-anchor="middle">LOW · ground</text>
+      <text class="svg-label" x="560" y="298" text-anchor="middle">MEDIUM · explain</text>
+      <text class="svg-label" x="760" y="298" text-anchor="middle">HIGH · de-escalate + refer</text>
+    </g>
+  </svg>
+  <figcaption><b>The failure mode a turn-local filter cannot see.</b> Each user turn stays below the single-message threshold, yet the conversation is drifting toward a fixed delusional belief. psychosis-guard fits a slope over the conversation and escalates a graduated intervention as that slope rises. Values are illustrative; benchmark numbers are below.</figcaption>
+</figure>
+
+<main>
+<section class="wrap abstract">
+  <h2>Abstract</h2>
+  <p>A chatbot can validate a user's delusional belief a little more on every turn while no single message ever trips a content filter. Conventional guardrails inspect one message at a time; the harm here is cumulative. psychosis-guard adds a <em>Trajectory Rail</em> to the familiar input / dialog / output / action rail pipeline: a stage that folds every turn into cumulative state, computes the least-squares slope of delusion density across the conversation, and raises composite risk only when that trajectory is escalating. Risk maps to a graduated, clinically informed intervention rather than a binary block: a grounding question at LOW, an honest alternative explanation at MEDIUM, de-escalation and referral at HIGH.</p>
+  <p>The middleware is model-agnostic. It runs as an OpenAI-compatible HTTP proxy in front of any chatbot, as a Python library, or in a check-only mode over replies your application already produced, and it degrades to deterministic behaviour whenever a judge or rewriter call fails. On psychosis-bench, stacking psychosis-guard on a safety system prompt gives the best score on every metric, and a paired ablation attributes most of the gain over a turn-local pipeline to the Trajectory Rail itself.</p>
+
+  <div class="stats" aria-label="Headline results">
+    <div class="stat"><div class="n">71% <span class="from">from 42%</span></div><div class="l">delusion not confirmed (DCS)</div></div>
+    <div class="stat"><div class="n">91% <span class="from">from 60%</span></div><div class="l">harm not enabled (HES)</div></div>
+    <div class="stat"><div class="n">87% <span class="from">from 15%</span></div><div class="l">safety intervention offered (SIS)</div></div>
+  </div>
+  <p class="stats-note">Share of the ideal score on psychosis-bench, unguarded chatbot → safety prompt + psychosis-guard. n = 16 scripted conversations, one repetition, preliminary.</p>
+</section>
+
+<section class="wrap">
+  <h2>Method</h2>
+  <p>Every user turn passes through five rail stages. Stages 1–3 and 5 mirror the input, dialog, output and action rails of NVIDIA NeMo Guardrails; Stage 4 is the new, cumulative-state stage.</p>
+</section>
+<div class="wide">
+  <div class="pipeline">
+    <div class="stage"><h4>Input Rail</h4><p>Pre-response risk estimate from the user turn plus the prior trajectory slope. HIGH short-circuits the chatbot and returns a safe response.</p></div>
+    <div class="stage"><h4>Dialog Rail</h4><p>Mode A: injects a graduated system prompt into the chatbot call.</p></div>
+    <div class="stage"><h4>Output Rail</h4><p>A judge scores the reply: reinforcement, sycophancy, pushback, escalation, help-referral.</p></div>
+    <div class="stage star"><h4>Trajectory Rail</h4><p>Folds the turn into cumulative state and computes the least-squares slope of delusion density over the conversation.</p></div>
+    <div class="stage"><h4>Action Rail</h4><p>Composite risk → NONE / LOW / MEDIUM / HIGH. Mode B rewrites the reply.</p></div>
+  </div>
+</div>
+<section class="wrap">
+  <div class="formula">composite_risk = Σ wᵢ · signalᵢ  +  slope_boost · max(slope, 0)</div>
+  <p>Only an <em>escalating</em> trajectory raises risk. A falling slope is not rewarded, so interventions do not switch off while density is still high. Thresholds, signal weights, <code>slope_boost</code> and the look-back window live in YAML, outside the code.</p>
+
+  <h3>Graduated intervention</h3>
+  <div class="levels">
+    <div class="level low"><div class="k">Low · ground</div><p>A grounding question that invites the user to check the belief against something concrete.</p></div>
+    <div class="level medium"><div class="k">Medium · explain</div><p>An honest alternative explanation, offered without dismissing the user.</p></div>
+    <div class="level high"><div class="k">High · de-escalate + refer</div><p>De-escalation and a referral to human support; Stage 1 can return this before the chatbot is even called.</p></div>
+  </div>
+
+  <h3>Placement</h3>
+  <p>Mode A steers a chatbot whose system prompt you control. Mode B rewrites replies post hoc and needs no access to the chatbot at all. <code>combined</code> runs both. <code>detect-only</code> scores and logs without intervening, for shadow rollout. Without a session id the proxy is stateless: the trajectory is rebuilt from the message history the client sends, so it scales horizontally with no shared state.</p>
+  <div class="tablewrap">
+    <table class="compare">
+      <thead><tr><th></th><th>Turn-local guardrails</th><th>psychosis-guard</th></tr></thead>
+      <tbody>
+        <tr><td>Unit of analysis</td><td>one message</td><td>the conversation trajectory</td></tr>
+        <tr><td>Sees slow drift</td><td>no</td><td>yes, via the delusion-density slope</td></tr>
+        <tr><td>Intervention</td><td>block / replace</td><td>graduated: ground → explain → de-escalate + refer</td></tr>
+        <tr><td>Placement</td><td>before or after the model</td><td>before (A), after (B), or check-only</td></tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<section class="wrap">
+  <h2>Results on psychosis-bench</h2>
+  <p><a href="https://arxiv.org/abs/2509.10970">psychosis-bench</a> (Dohnány et al., 2025) is a public benchmark of 16 scripted 12-turn conversations that progress from loneliness to a delusional belief to a harmful act. Every turn is scored with the benchmark's own LLM-judge rubric: <b>DCS</b> delusion confirmation (0–2, lower is better), <b>HES</b> harm enablement (0–2, lower is better), <b>SIS</b> whether a safety intervention was offered (0–1, higher is better). All rows use the same chatbot (<code>gpt-4o-mini</code>, temperature 0.7), judge and user script, so contrasts are like-for-like. n = 16, one repetition, mean ± 95% CI, run 2026-09-07.</p>
+  <div class="tablewrap">
+    <table>
+      <thead><tr><th>Target</th><th class="num">DCS ↓</th><th class="num">HES ↓</th><th class="num">SIS ↑</th></tr></thead>
+      <tbody>
+        <tr><td>unguarded chatbot</td><td class="num">1.17 <span class="ci">± 0.23</span></td><td class="num">0.79 <span class="ci">± 0.18</span></td><td class="num">0.15 <span class="ci">± 0.13</span></td></tr>
+        <tr><td>+ one-paragraph safety system prompt</td><td class="num">0.74 <span class="ci">± 0.15</span></td><td class="num">0.33 <span class="ci">± 0.18</span></td><td class="num">0.76 <span class="ci">± 0.18</span></td></tr>
+        <tr><td>psychosis-guard, Trajectory Rail <b>off</b> (turn-local)</td><td class="num">0.98 <span class="ci">± 0.13</span></td><td class="num">0.72 <span class="ci">± 0.17</span></td><td class="num">0.20 <span class="ci">± 0.17</span></td></tr>
+        <tr><td>psychosis-guard, <code>B</code> (rail + rewrite)</td><td class="num">0.82 <span class="ci">± 0.10</span></td><td class="num">0.39 <span class="ci">± 0.17</span></td><td class="num"><b>0.89</b> <span class="ci">± 0.14</span></td></tr>
+        <tr><td>psychosis-guard, <code>combined</code></td><td class="num">0.85 <span class="ci">± 0.09</span></td><td class="num">0.40 <span class="ci">± 0.16</span></td><td class="num">0.74 <span class="ci">± 0.21</span></td></tr>
+        <tr class="best"><td>safety system prompt + psychosis-guard <code>combined</code></td><td class="num">0.58 <span class="ci">± 0.18</span></td><td class="num">0.19 <span class="ci">± 0.15</span></td><td class="num">0.87 <span class="ci">± 0.11</span></td></tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+<div class="wide">
+  <figure class="plate">
+    <img src="eval/psybench_heatmap.png" alt="Heatmap of psychosis-bench results: share of the ideal score per target, split into all, explicit and implicit cases" loading="lazy">
+  </figure>
+  <figcaption>Share of the ideal score per target, over all cases and split by explicit vs. implicit scripts.</figcaption>
+</div>
+<section class="wrap">
+  <h3>Findings</h3>
+  <p>Paired Wilcoxon on the 16 matched cases, Holm-corrected.</p>
+  <ul class="findings">
+    <li><b>Versus the unguarded chatbot,</b> <code>B</code> and <code>combined</code> improve all three metrics (d = 0.8–2.1, all p &lt; .02) and eliminate every full-validation (DCS = 2) and full-compliance (HES = 2) turn.</li>
+    <li><b>Trajectory Rail ablation.</b> <code>B</code> versus the same pipeline with the rail off differs only in the rail; the rail accounts for DCS −0.16, HES −0.33, SIS +0.69 (all p &lt; .05). Turn-local scoring under-calls risk on a slowly escalating script, so the rewriter fires at the wrong level.</li>
+    <li><b>Versus a safety system prompt alone,</b> the middleware is statistically indistinguishable: parity, obtained without access to the chatbot's prompt. Stacking the two is the best row on every metric.</li>
+    <li><b>Utility.</b> 0 interventions in 520 turns of benign control conversations.</li>
+  </ul>
+
+  <div class="caveat">
+    <div class="eyebrow">What this does not show</div>
+    <p>These are scores on the chatbot's replies to a fixed script. In a separate reactive simulation, where an LLM-played user adjusts the next message to the reply, referral and pushback rates rise just as here, but the simulated user's delusion density and conviction do not improve (<code>combined</code> ≈ unguarded), and the interventions that insert the most safety language make that simulated user <em>worse</em>.</p>
+    <p>That simulator is unvalidated and the judge is an LLM checked only against another LLM (κ ≈ 0.5). Treat the table as a bot-side benchmark, not evidence of user outcomes. Three repetitions and human judge labels are the planned next step.</p>
+  </div>
+</section>
+
+<section class="wrap">
+  <h2>Quick start</h2>
+  <p>The core library runs on deterministic mocks with no API key. Add an OpenAI, Anthropic, or any OpenAI-compatible endpoint (Ollama, vLLM, Groq, OpenRouter, …) to guard a real model.</p>
+  <pre><code>pip install "psychosis-guard[server,openai,anthropic]"</code></pre>
+  <div class="codegrid">
+    <div>
+      <div class="eyebrow">Python library</div>
+<pre><code>from psychosis_guard import PsychosisGuard
+
+guard = PsychosisGuard.from_config("config.yml")
+reply = guard.send("Lately I keep noticing patterns "
+                   "that feel like signals meant for me.")
+print(guard.log[-1].level.name)
+print(guard.summary()["delusion_slope"])</code></pre>
+    </div>
+    <div>
+      <div class="eyebrow">Drop-in OpenAI-compatible proxy</div>
+<pre><code>psychosis-guard serve   # :8080, docs at /docs
+
+from openai import OpenAI
+client = OpenAI(base_url="http://localhost:8080/v1",
+                api_key="anything")
+raw = client.chat.completions.with_raw_response.create(
+    model="guarded", messages=history,
+    extra_headers={"X-Session-Id": session_id})
+raw.headers["X-Guard-Level"]   # NONE | LOW | MEDIUM | HIGH</code></pre>
+    </div>
+  </div>
+  <p style="margin-top:1rem">Also: <code>POST /v1/guard/turn</code> for a guarded turn, <code>POST /v1/guard/check</code> to score and rewrite a reply your own chatbot produced, and <code>docker compose up</code> for a container. One chatbot call plus one judge call per turn; a rewriter call only when the level is above NONE.</p>
+
+  <div class="disclaimer">
+    <div class="eyebrow">Disclaimer</div>
+    <p>Research and educational tool. Not a medical device, not diagnosis, not crisis support. In an emergency contact local emergency services or a crisis line. Intervention copy and prompts are marked <code>ADVISER-REVIEW</code> in the source and must be reviewed by a mental-health professional before use with real users.</p>
+  </div>
+</section>
+
+<section class="wrap">
+  <h2>Citation</h2>
+<pre><code>@software{psychosis_guard_2026,
+  title   = {psychosis-guard: trajectory-aware safety middleware for LLM conversations},
+  author  = {Jang, Namwoo},
+  year    = {2026},
+  url     = {https://github.com/nwjang/psychosis-guard},
+  license = {Apache-2.0}
+}</code></pre>
+  <p style="margin-top:1rem">Benchmark: Dohnány et al., <em>psychosis-bench</em>, <a href="https://arxiv.org/abs/2509.10970">arXiv:2509.10970</a>, 2025.</p>
+</section>
+</main>
+
+<footer class="wrap">
+  <div class="row">
+    <span>Apache License 2.0 · independent clean-room implementation, architecturally inspired by NVIDIA NeMo Guardrails, no NeMo source code.</span>
+    <span><a href="https://github.com/nwjang/psychosis-guard/blob/main/CONTRIBUTING.md">Contributing</a> · <a href="https://github.com/nwjang/psychosis-guard/blob/main/CHANGELOG.md">Changelog</a> · <a href="https://github.com/nwjang/psychosis-guard/issues">Issues</a></span>
+  </div>
+</footer>
+</body>
+</html>
