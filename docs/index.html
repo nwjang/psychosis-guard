@@ -22,7 +22,22 @@ a{color:var(--link);text-decoration:none}
 a:hover{text-decoration:underline}
 :focus-visible{outline:2px solid var(--link);outline-offset:3px}
 img{max-width:100%;height:auto;display:block}
-main{max-width:640px;margin:0 auto;padding:96px 24px 80px}
+main{max-width:640px;margin:0 auto;padding:64px 24px 80px}
+.hero{background:#000;color:#f5f5f7;padding:96px 24px 88px;text-align:center}
+.hero .in{max-width:900px;margin:0 auto}
+.hero .eyebrow{font-size:.8125rem;font-weight:600;letter-spacing:.04em;text-transform:uppercase;color:#86868b}
+.hero h1{font-size:clamp(2.75rem,7vw,4.5rem);font-weight:700;letter-spacing:-.03em;line-height:1.05;margin:14px 0 0;color:#f5f5f7}
+.hero .sub{font-size:clamp(1.125rem,2.2vw,1.5rem);color:#86868b;max-width:720px;margin:22px auto 0;line-height:1.4;letter-spacing:-.012em}
+.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:24px;margin-top:72px}
+.stat .v{font-size:clamp(3.5rem,9vw,6rem);font-weight:700;letter-spacing:-.045em;line-height:1;background:linear-gradient(90deg,#0a84ff,#5e5ce6 55%,#bf5af2);-webkit-background-clip:text;background-clip:text;color:transparent;font-variant-numeric:tabular-nums}
+.stat .k{font-size:1.0625rem;font-weight:600;margin-top:16px;color:#f5f5f7}
+.stat .d{font-size:.9375rem;color:#86868b;margin-top:4px}
+.hero .foot{font-size:.8125rem;color:#86868b;margin:64px auto 0;max-width:760px}
+.hero .foot code{color:#a1a1a6}
+.hero .links{justify-content:center;margin-top:36px;gap:8px 28px;font-size:1.0625rem}
+.hero .links a{color:#2997ff}
+.hero .links a::after{content:" ›"}
+@media (max-width:640px){.hero{padding:72px 24px 64px}.stats{grid-template-columns:1fr;gap:40px;margin-top:56px}}
 h1{font-size:2.5rem;font-weight:600;letter-spacing:-.025em;line-height:1.1;margin:0}
 h2{font-size:1.25rem;font-weight:600;letter-spacing:-.015em;margin:64px 0 12px}
 p{margin:0 0 16px}
@@ -55,20 +70,28 @@ footer a{color:var(--ink-2);text-decoration:underline}
 </style>
 </head>
 <body>
+<header class="hero">
+  <div class="in">
+    <div class="eyebrow">psychosis-guard · results on psychosis-bench</div>
+    <h1>AI safety shouldn't reset every turn.</h1>
+    <p class="sub">Trajectory-aware safety middleware for LLM chatbots. It watches the whole conversation, not one message, and steps in before slow drift toward a delusional belief compounds.</p>
+    <div class="stats">
+      <div class="stat"><div class="v">71%</div><div class="k">Delusion not confirmed</div><div class="d">up from 42% unguarded</div></div>
+      <div class="stat"><div class="v">91%</div><div class="k">Harm not enabled</div><div class="d">up from 60% unguarded</div></div>
+      <div class="stat"><div class="v">87%</div><div class="k">Safety intervention offered</div><div class="d">up from 15% unguarded</div></div>
+    </div>
+    <p class="foot">Share of the ideal score, safety prompt + psychosis-guard <code>combined</code>, on psychosis-bench (Dohnány et al., 2025): 16 scripted twelve-turn conversations that progress from loneliness to a delusional belief to a harmful act. Same chatbot and judge (<code>gpt-4o-mini</code>) for every row. n = 16, one repetition, run 2026-09-07. Preliminary.</p>
+    <div class="links">
+      <a href="https://github.com/nwjang/psychosis-guard">GitHub</a>
+      <a href="https://pypi.org/project/psychosis-guard/">PyPI</a>
+      <a href="https://github.com/nwjang/psychosis-guard/tree/main/docs">Docs</a>
+      <a href="https://arxiv.org/abs/2509.10970">psychosis-bench</a>
+      <a href="https://github.com/nwjang/psychosis-guard/blob/main/README.ko.md">한국어</a>
+    </div>
+  </div>
+</header>
+
 <main>
-
-<h1>psychosis-guard</h1>
-<p class="lead">AI safety shouldn't reset every turn.</p>
-<p class="meta">Trajectory-aware safety middleware for long-running LLM conversations. Open source, Apache 2.0, Python 3.10+.<br>Namwoo Jang</p>
-<div class="links">
-  <a href="https://github.com/nwjang/psychosis-guard">GitHub</a>
-  <a href="https://pypi.org/project/psychosis-guard/">PyPI</a>
-  <a href="https://github.com/nwjang/psychosis-guard/tree/main/docs">Docs</a>
-  <a href="https://arxiv.org/abs/2509.10970">psychosis-bench</a>
-  <a href="https://github.com/nwjang/psychosis-guard/blob/main/README.ko.md">한국어</a>
-</div>
-
-<hr>
 
 <p>A chatbot can validate a user's delusional belief a little more on every turn while no single message ever trips a content filter. Conventional guardrails inspect one message at a time; the harm here is cumulative.</p>
 <p>psychosis-guard tracks the whole conversation, scores where it is heading, and steps in with a graduated intervention before that drift compounds. It runs as an OpenAI-compatible HTTP proxy in front of any chatbot, as a Python library, or in a check-only mode over replies your application already has. Without an API key, the whole pipeline runs on deterministic mocks.</p>
@@ -88,8 +111,8 @@ footer a{color:var(--ink-2);text-decoration:underline}
 <div class="formula">risk = Σ wᵢ · signalᵢ + slope_boost · max(slope, 0)</div>
 <p>Only an escalating trajectory raises risk; a falling slope is not rewarded, so interventions do not switch off while density is still high. The intervention is graduated rather than binary: a grounding question at LOW, an honest alternative explanation at MEDIUM, de-escalation and referral at HIGH. Thresholds and weights live in YAML.</p>
 
-<h2>Results</h2>
-<p>Measured on <a href="https://arxiv.org/abs/2509.10970">psychosis-bench</a> (Dohnány et al., 2025): 16 scripted 12-turn conversations that progress from loneliness to a delusional belief to a harmful act, scored with the benchmark's own LLM-judge rubric. DCS is delusion confirmation (0–2, lower is better), HES harm enablement (0–2, lower is better), SIS whether a safety intervention was offered (0–1, higher is better). Same chatbot (<code>gpt-4o-mini</code>), judge and script for every row. n = 16, one repetition, mean ± 95% CI.</p>
+<h2>Results in detail</h2>
+<p>Every turn is scored with the benchmark's own LLM-judge rubric. DCS is delusion confirmation (0–2, lower is better), HES harm enablement (0–2, lower is better), SIS whether a safety intervention was offered (0–1, higher is better). Mean ± 95% CI over the 16 cases.</p>
 <div class="wide">
 <table>
   <thead><tr><th>Target</th><th class="n">DCS ↓</th><th class="n">HES ↓</th><th class="n">SIS ↑</th></tr></thead>
@@ -138,7 +161,7 @@ guard.log[-1].level.name                            # NONE | LOW | MEDIUM | HIGH
   url    = {https://github.com/nwjang/psychosis-guard}
 }</code></pre>
 
-<footer>Apache License 2.0. Independent clean-room implementation, architecturally inspired by NVIDIA NeMo Guardrails; contains no NeMo source code. <a href="https://github.com/nwjang/psychosis-guard/blob/main/CONTRIBUTING.md">Contributing</a> · <a href="https://github.com/nwjang/psychosis-guard/blob/main/CHANGELOG.md">Changelog</a></footer>
+<footer>Namwoo Jang. Apache License 2.0. Independent clean-room implementation, architecturally inspired by NVIDIA NeMo Guardrails; contains no NeMo source code. <a href="https://github.com/nwjang/psychosis-guard/blob/main/CONTRIBUTING.md">Contributing</a> · <a href="https://github.com/nwjang/psychosis-guard/blob/main/CHANGELOG.md">Changelog</a></footer>
 
 </main>
 </body>
